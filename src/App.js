@@ -1,25 +1,28 @@
 import logo from './logo.svg';
 import './App.css';
+import Layout from './scenes/layout';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { lightTheme } from './theme';
+import Products from './scenes/products';
 
-function App() {
-  return (
+  function App() {
+    return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <BrowserRouter>
+        <ThemeProvider theme={lightTheme}>
+          <CssBaseline />
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path='/' element = {<Navigate to="/home" replace />} />
+              <Route path='/products' element = {Products} />
+            </Route>
+          </Routes>
+        </ThemeProvider>
+      </BrowserRouter>
+
     </div>
-  );
-}
+    );
+  }
 
 export default App;
