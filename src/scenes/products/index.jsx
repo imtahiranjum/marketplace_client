@@ -11,8 +11,8 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { useGetProductQuery } from "../../state/api";
 import Header from "../../components/Header";
+import { useGetProductQuery } from "state/api";
 
 const Product = ({
   _id,
@@ -32,14 +32,14 @@ const Product = ({
     <Card
       sx={{
         backgroundImage: "none",
-        backgroundColor: theme.palette.background.alt,
+        backgroundColor: theme.palette.secondary,
         borderRadius: "0.55rem",
       }}
     >
       <CardContent>
         <Typography
           sx={{ fontSize: 14 }}
-          color={theme.palette.secondary[200]}
+          color={theme.palette.secondary}
           gutterBottom
         >
           {category}
@@ -47,7 +47,7 @@ const Product = ({
         <Typography variant="h5" component="div">
           {title}
         </Typography>
-        <Typography sx={{ mb: "1.5rem" }} color={theme.palette.secondary[400]}>
+        <Typography sx={{ mb: "1.5rem" }} color={theme.palette.secondary}>
           ${Number(price).toFixed(2)}
         </Typography>
 
