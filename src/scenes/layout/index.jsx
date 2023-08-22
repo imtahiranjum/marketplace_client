@@ -1,11 +1,10 @@
 import React, {useState} from 'react'
 import { Box, useMediaQuery } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-
-import Navbar from '../../components/Navbar';
 import { useGetUserQuery } from 'state/api';
 import { useSelector } from 'react-redux';
-import Sidebar from 'components/Sidebar';
+import ResponsiveAppBar from 'components/Appbar';
+import AppFooter from 'components/AppFooter';
 
 
 const Layout = () => {
@@ -16,21 +15,18 @@ const Layout = () => {
   console.log("🚀 ~ file: index.jsx:19 ~ Layout ~ data:", data)
   
   return (
+    <div>
     <Box display={isNonMobile ? 'flex'  : 'block'} width="100%" height="100%">
-      <Sidebar
-        isNonMobile = {isNonMobile}
-        drawerWidth = "250px"
-        isSidebarOpen = {isSidebarOpen}
-        setIsSidebarOpen = {setIsSidebarOpen}
+      <ResponsiveAppBar
+      isSidebarOpen = {isSidebarOpen}
+      setIsSidebarOpen = {setIsSidebarOpen}
       />
-      <Box flexGrow={1}>
-        <Navbar 
-          isSidebarOpen = {isSidebarOpen}
-          setIsSidebarOpen = {setIsSidebarOpen}
-        />
-        <Outlet />
-      </Box>
     </Box>
+    <Box mt={"6rem"}>
+      <Outlet/>
+      <AppFooter/>
+    </Box>
+    </div>
   )
 }
 
