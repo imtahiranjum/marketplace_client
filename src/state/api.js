@@ -5,7 +5,7 @@ export const api = createApi({
   reducerPath: "adminApi",
   tagTypes: [
     "User",
-    "Products",
+    "OnSaleCattle",
     "Staff",
     "Employee",
     "AddProduct",
@@ -16,68 +16,14 @@ export const api = createApi({
       query: (id) => `general/user/${id}`,
       providesTags: ["User"],
     }),
-    getProduct: build.query({
-      query: () => `client/products/`,
-      providesTags: ["Product"],
-    }),
-    setProduct: build.query({
-      query: (data) => `client/addProduct`,
-      providesTags: ["AddProduct"],
-    }),
-    getStaff: build.query({
-      query: () => `client/staff/`,
-      providesTags: ["Staff"],
-    }),
-    getDoctor: build.query({
-      query: () => `client/doctors/`,
-      providesTags: ["Doctor"],
-    }),
-    getEmployee: build.query({
-      query: (id) => `client/staff/${id}`,
-      providesTags: ["Employee"],
-    }),
-    getDashboard: build.query({
-      query: () => "general/dashboard",
-      providesTags: ["Dashboard"],
-    }),
-    getTransactions: build.query({
-      query: ({ page, pageSize, sort, search }) => ({
-        url: "client/transactions",
-        method: "GET",
-        params: { page, pageSize, sort, search },
-      }),
-      providesTags: ["Transactions"],
-    }),
-    getGeography: build.query({
-      query: () => "client/geography",
-      providesTags: ["Geography"],
-    }),
-    getSales: build.query({
-      query: () => "sales/sales",
-      providesTags: ["Sales"],
-    }),
-    getAdmins: build.query({
-      query: () => "management/admins",
-      providesTags: ["Admins"],
-    }),
-    getUserPerformance: build.query({
-      query: (id) => `management/performance/${id}`,
-      providesTags: ["Performance"],
+    getOnSaleCattle: build.query({
+      query: () => `onsalecattle/onsalecattle/`,
+      providesTags: ["OnSaleCattle"],
     }),
   }),
 });
 
 export const {
   useGetUserQuery,
-  useGetProductQuery,
-  useGetEmployeeQuery,
-  useGetStaffQuery,
-  useGetDoctorQuery,
-  useSetProductQuery,
-  useGetDashboardQuery,
-  useGetAdminsQuery,
-  useGetGeographyQuery,
-  useGetSalesQuery,
-  useGetTransactionsQuery,
-  useGetUserPerformanceQuery
+  useGetOnSaleCattleQuery,
 } = api;
