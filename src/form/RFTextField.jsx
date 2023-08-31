@@ -8,6 +8,7 @@ function RFTextField(props) {
     autoComplete,
     input,
     InputProps,
+    onChange,
     meta: { touched, error, submitError },
     ...other
   } = props;
@@ -20,6 +21,7 @@ function RFTextField(props) {
       InputProps={{
         inputProps: {
           autoComplete,
+          onChange
         },
         ...InputProps,
       }}
