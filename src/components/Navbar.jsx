@@ -2,10 +2,15 @@ import React, { useState } from "react";
 import {
   LightModeOutlined,
   DarkModeOutlined,
+  Menu as MenuIcon,
   Search,
   SettingsOutlined,
   ArrowDropDownOutlined,
 } from "@mui/icons-material";
+import FlexBetween from "./FlexBetween";
+import { useDispatch } from "react-redux";
+import { setMode } from "state";
+import profileImage from "assets/profile.jpeg";
 import {
   AppBar,
   IconButton,
@@ -19,9 +24,9 @@ import {
   MenuItem,
 
 } from "@mui/material";
-import FlexBetween from "./FlexBetween";
 
 const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
+  const dispatch = useDispatch();
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -44,15 +49,18 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
       >
         {/* Left side*/}
         <FlexBetween>
+          <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+            <MenuIcon />
+          </IconButton>
           <FlexBetween
-            backgroundColor= "grey"
+            backgroundColor={theme.palette.secondary}
             borderRadius="9px"
             gap="3rem"
             p="0.1rem 1.5rem"
             marginRight="1rem"
             marginLeft="1rem"
           >
-            <InputBase placeholder="Search..." />
+            <InputBase placeholder="Search..." backgroundColor={theme.palette.secondary}/>
             <IconButton>
               <Search />
             </IconButton>
@@ -61,8 +69,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
 
         {/* Right side*/}
         <FlexBetween gap="1.5rem">
-          <IconButton >
-          {/* onClick={() => dispatch(setMode())} */}
+          <IconButton onClick={() => dispatch(setMode())}>
             {theme.palette.mode === "dark" ? (
               <DarkModeOutlined sx={{ fontSize: "25px" }} />
             ) : (
@@ -86,7 +93,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               <Box
                 component="img"
                 alt="profile"
-                // src={profileImage}
+                src={profileImage}
                 height="32px"
                 width="32px"
                 borderRadius="50%"
@@ -96,20 +103,20 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                 <Typography
                   fontWeight="bold"
                   fontSize="0.85rem"
-                  sx={{ color: "yellowgreen"}}
+                  sx={{ color: theme.palette.primary}}
                 >
                   Tahir
                 </Typography>
                 <Typography
                   fontSize="0.75rem"
-                  sx={{ color: "red"}}
+                  sx={{ color: theme.palette.primary }}
                 >
                   Manager
                 </Typography>
               </Box>
               <ArrowDropDownOutlined
                 sx={{
-                  color: "whitesmoke",
+                  color: theme.palette.secondary,
                   fontSize: "25px ",
                 }}
               />
