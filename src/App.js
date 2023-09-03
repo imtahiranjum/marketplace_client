@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import './App.css';
+import './index.css';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { lightTheme, themeSettings } from './theme';
@@ -10,6 +10,7 @@ import ProductDetails from 'scenes/productDetails';
 import Layout from 'scenes/layout';
 import SignIn from 'scenes/signin';
 import SignUp from 'scenes/signup';
+import ForgotPassword from 'scenes/forgotPassword';
 
   function App() {
     const mode = useSelector((state) => state.global.mode)
@@ -24,6 +25,7 @@ import SignUp from 'scenes/signup';
               <Route path='/products' element = {<Products/>} />
               <Route path='/signin' element = {<SignIn/>} />
               <Route path='/signup' element = {<SignUp/>} />
+              <Route path='/forgotpassword' element = {<ForgotPassword/>} />
             </Route>
           </Routes>
         </ThemeProvider>
