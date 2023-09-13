@@ -10,6 +10,8 @@ export const api = createApi({
     "Employee",
     "AddProduct",
     "Dashboard",
+    "signup",
+    "SpecificOnSaleCattle"
   ],
   endpoints: (build) => ({
     getUser: build.query({
@@ -17,8 +19,22 @@ export const api = createApi({
       providesTags: ["User"],
     }),
     getOnSaleCattle: build.query({
-      query: () => `onsalecattle/onsalecattle/`,
+      query: () => `onsalecattle/`,
       providesTags: ["OnSaleCattle"],
+    }),
+
+    getSpecificOnSaleCattle: build.query({
+      query: (id) => `onsalecattle/specificonsalecattle/${id}`
+      ,
+      providesTags: ["SpecificOnSaleCattle"],
+    }),
+    createUser: build.mutation({
+      query: (firstName, lastName, newEmail, password, passwordVerify) => ({
+        url:'user/signup/',
+        method: "POST",
+        body: firstName, lastName, newEmail, password, passwordVerify
+      }),
+      providesTags: ["signup"],
     }),
   }),
 });
@@ -26,4 +42,6 @@ export const api = createApi({
 export const {
   useGetUserQuery,
   useGetOnSaleCattleQuery,
+  useGetSpecificOnSaleCattleQuery,
+  useCreateUserMutation,
 } = api;
