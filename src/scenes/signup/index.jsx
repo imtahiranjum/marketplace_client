@@ -1,27 +1,33 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
-import { Field, Form, FormSpy } from 'react-final-form';
-import Typography from 'components/Typography';
-import AppForm from 'components/AppForm';
-import { email, required } from 'form/validation';
-import RFTextField from 'form/RFTextField';
-import FormButton from 'form/FormButton';
-import FormFeedback from 'form/FormFeedback';
-// import AppAppBar from './modules/views/AppAppBar';
-// import AppForm from './modules/views/AppForm';
-// import { email, required } from './modules/form/validation';
-// import RFTextField from './modules/form/RFTextField';
-// import FormButton from './modules/form/FormButton';
-// import FormFeedback from './modules/form/FormFeedback';
-// import withRoot from './modules/withRoot';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
+import { Field, Form, FormSpy } from "react-final-form";
+import Typography from "components/Typography";
+import AppForm from "components/AppForm";
+import { email, required } from "form/validation";
+import RFTextField from "form/RFTextField";
+import FormButton from "form/FormButton";
+import FormFeedback from "form/FormFeedback";
+import { useCreateUserMutation } from "state/api";
+import { useState } from "react";
+import { Navigate, redirect } from "react-router-dom";
+import AllOnSaleCattle from "scenes/products";
 
 function SignUp() {
   const [sent, setSent] = React.useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordVerify, setPasswordVerify] = useState("");
+  const [createUser] = useCreateUserMutation();
 
   const validate = (values) => {
-    const errors = required(['firstName', 'lastName', 'email', 'password'], values);
+    const errors = required(
+      ["firstName", "lastName", "email", "password"],
+      values
+    );
 
     if (!errors.email) {
       const emailError = email(values.email);
@@ -33,8 +39,26 @@ function SignUp() {
     return errors;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setSent(true);
+    console.log(firstName, lastName, newEmail, password, passwordVerify);
+    try{
+    const payload = await createUser({
+      firstName: firstName,
+      lastName: lastName,
+      email: newEmail,
+      password: password,
+      passwordVerify: passwordVerify,
+    });
+    console.log("User Created");
+    return (
+      <Navigate to="/products" replace />
+    )
+  }
+  catch(error){
+    console.log("Error Occurred", error);
+
+  }
   };
 
   return (
@@ -56,18 +80,25 @@ function SignUp() {
           validate={validate}
         >
           {({ handleSubmit: handleSubmit2, submitting }) => (
-            <Box component="form" onSubmit={handleSubmit2} noValidate sx={{ mt: 6 }}>
+            <Box
+              component="form"
+              onSubmit={handleSubmit2}
+              noValidate
+              sx={{ mt: 6 }}
+            >
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Field
                     autoFocus
-                    component={RFTextField}
+                    subscription={{ value: true, active: true }}
                     disabled={submitting || sent}
+                    component={RFTextField}
                     autoComplete="given-name"
                     fullWidth
                     label="First name"
                     name="firstName"
                     required
+                    onChange={(e) => setFirstName(e.target.value)}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -79,6 +110,7 @@ function SignUp() {
                     label="Last name"
                     name="lastName"
                     required
+                    onChange={(e) => setLastName(e.target.value)}
                   />
                 </Grid>
               </Grid>
@@ -91,6 +123,7 @@ function SignUp() {
                 margin="normal"
                 name="email"
                 required
+                onChange={(e) => setNewEmail(e.target.value)}
               />
               <Field
                 fullWidth
@@ -102,6 +135,19 @@ function SignUp() {
                 label="Password"
                 type="password"
                 margin="normal"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Field
+                fullWidth
+                component={RFTextField}
+                disabled={submitting || sent}
+                required
+                name="passwordVerify"
+                autoComplete="new-password"
+                label="Re-Enter Password"
+                type="password"
+                margin="normal"
+                onChange={(e) => setPasswordVerify(e.target.value)}
               />
               <FormSpy subscription={{ submitError: true }}>
                 {({ submitError }) =>
@@ -118,7 +164,7 @@ function SignUp() {
                 color="secondary"
                 fullWidth
               >
-                {submitting || sent ? 'In progress…' : 'Sign Up'}
+                {submitting || sent ? "In progress…" : "Sign Up"}
               </FormButton>
             </Box>
           )}
@@ -128,4 +174,4 @@ function SignUp() {
   );
 }
 
-export default SignUp
+export default SignUp;
