@@ -8,9 +8,12 @@ import { email, required } from 'form/validation';
 import RFTextField from 'form/RFTextField';
 import FormButton from 'form/FormButton';
 import FormFeedback from 'form/FormFeedback';
+import { useTheme } from '@emotion/react';
+import EFarm from 'components/EFarm';
 
 function SignIn() {
   const [sent, setSent] = React.useState(false);
+  const theme = useTheme();
 
   const validate = (values) => {
     const errors = required(['email', 'password'], values);
@@ -32,8 +35,9 @@ function SignIn() {
   return (
     <React.Fragment>
       <AppForm>
+      <EFarm/>
         <React.Fragment>
-          <Typography variant="h3" gutterBottom marked="center" align="center">
+          <Typography variant="h4" gutterBottom marked="center" align="center">
             Sign In
           </Typography>
           <Typography variant="body2" align="center">
@@ -53,7 +57,8 @@ function SignIn() {
           validate={validate}
         >
           {({ handleSubmit: handleSubmit2, submitting }) => (
-            <Box component="form" onSubmit={handleSubmit2} noValidate sx={{ mt: 6 }}>
+            <Box component="form" onSubmit={handleSubmit2} noValidate sx={{ mt: 6,
+              }}>
               <Field
                 autoComplete="email"
                 autoFocus
@@ -90,7 +95,7 @@ function SignIn() {
               <FormButton
                 sx={{ mt: 3, mb: 2 }}
                 disabled={submitting || sent}
-                size="large"
+                size="medium"
                 color="secondary"
                 fullWidth
               >
@@ -103,6 +108,20 @@ function SignIn() {
           <Link underline="always" href="/forgotpassword/">
             Forgot password?
           </Link>
+
+          <Box
+              sx={{
+                marginTop: "2rem",
+                alignItems: "center",
+              }}
+            >
+              {"© "}
+              <Link color="inherit" href="http://localhost:3000/">
+                eFarm
+              </Link>{" "}
+              {"All Rights Reserved "}
+              {new Date().getFullYear()}
+            </Box>
         </Typography>
       </AppForm>
     </React.Fragment>

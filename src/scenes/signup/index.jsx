@@ -13,6 +13,7 @@ import { useCreateUserMutation } from "state/api";
 import { useState } from "react";
 import { Navigate, redirect } from "react-router-dom";
 import AllOnSaleCattle from "scenes/products";
+import EFarm from "components/eFarm";
 
 function SignUp() {
   const [sent, setSent] = React.useState(false);
@@ -64,6 +65,7 @@ function SignUp() {
   return (
     <React.Fragment>
       <AppForm>
+        <EFarm/>
         <React.Fragment>
           <Typography variant="h3" gutterBottom marked="center" align="center">
             Sign Up
