@@ -13,7 +13,7 @@ import { useCreateUserMutation } from "state/api";
 import { useState } from "react";
 import { Navigate, redirect } from "react-router-dom";
 import AllOnSaleCattle from "scenes/products";
-import EFarm from "components/eFarm";
+import EFarm from "components/EFarm";
 
 function SignUp() {
   const [sent, setSent] = React.useState(false);
@@ -171,6 +171,24 @@ function SignUp() {
             </Box>
           )}
         </Form>
+
+          <Box
+              sx={{
+                marginTop: "2rem",
+                display: "flex",
+                // alignContent: "center",
+                justifyContent: "center"
+              }}
+            >
+              {"© "}
+              <Link color="inherit" href="http://localhost:3000/">
+                eFarm 
+              </Link>
+              {" "}
+              {" All Rights Reserved. "}
+              {new Date().getFullYear()}
+            </Box>
+
       </AppForm>
     </React.Fragment>
   );
