@@ -11,14 +11,11 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import efarmlogo from "assets/efarmlogo.png"
-import { DarkModeOutlined, Image, LightModeOutlined, LightModeRounded, Search } from '@mui/icons-material';
-import FlexBetween from './FlexBetween';
+import { Image } from '@mui/icons-material';
 import SearchIcon from '@mui/icons-material/Search';
 import { InputBase, Link } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { setMode } from 'state';
 import { useTheme } from '@emotion/react';
 import { styled, alpha } from '@mui/material/styles';
 
@@ -46,11 +43,9 @@ function ResponsiveAppBar({ user, isSidebarOpen, setIsSidebarOpen }) {
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
-
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
@@ -84,7 +79,6 @@ function ResponsiveAppBar({ user, isSidebarOpen, setIsSidebarOpen }) {
     color: 'inherit',
     '& .MuiInputBase-input': {
       padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
       paddingLeft: `calc(1em + ${theme.spacing(4)})`,
       transition: theme.transitions.create('width'),
       width: '100%',
@@ -99,9 +93,7 @@ function ResponsiveAppBar({ user, isSidebarOpen, setIsSidebarOpen }) {
 
   return (
     <div>
-
-    <AppBar position="fixed" sx={{
-      
+    <AppBar position="fixed" sx={{  
     }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
@@ -201,7 +193,7 @@ function ResponsiveAppBar({ user, isSidebarOpen, setIsSidebarOpen }) {
               </Button>
             ))}
           </Box>
-
+          {}
           <Search sx={{ display: { xs: "none", md: "flex", marginRight: "1rem"}}}>
             <SearchIconWrapper>
               <SearchIcon />
@@ -250,14 +242,6 @@ function ResponsiveAppBar({ user, isSidebarOpen, setIsSidebarOpen }) {
               sx={rightLink}
             >
               {'Sign In'}
-            </Link>
-            <Link
-              variant="h6"
-              underline="none"
-              href="/signup"
-              sx={{ ...rightLink, color: 'secondary.main' }}
-            >
-              {'Sign Up'}
             </Link>
           </Box>
           }
