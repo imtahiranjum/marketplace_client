@@ -11,6 +11,7 @@ import {
   useMediaQuery,
   CardMedia,
   CardActionArea,
+  Skeleton,
 } from "@mui/material";
 import Header from "../../components/Header";
 import { useGetOnSaleCattleQuery } from "state/api";
@@ -48,31 +49,30 @@ const OnSaleCattle = ({
     questions,
   };
   const navigateToDetailsPage = () => {
-    navigate('/productdetails', { replace: true, state: {propsToPass} });
+    navigate("/productdetails", { replace: false, state: { propsToPass } });
   };
   const theme = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [buttonName, setButtonName] = useState("View More")
+  const [buttonName, setButtonName] = useState("View More");
   const handleClick = () => {
     navigateToDetailsPage();
-  }
+  };
 
   const handleButtonName = () => {
-    if (isExpanded){
-      setButtonName("View Less")
+    if (isExpanded) {
+      setButtonName("View Less");
+    } else {
+      setButtonName("View More");
     }
-    else {
-      setButtonName("View More") 
-    }
-  } 
-  
+  };
+
   useEffect(() => {
-    handleButtonName()}
-    , [isExpanded]);
-  
-    // useEffect(() => {
-    //   handleButtonName()}
-    //   , [isExpanded]);
+    handleButtonName();
+  }, [isExpanded]);
+
+  // useEffect(() => {
+  //   handleButtonName()}
+  //   , [isExpanded]);
 
   return (
     <Card
@@ -82,22 +82,25 @@ const OnSaleCattle = ({
         borderRadius: "0.55rem",
         borderColor: "darkgrey",
         maxWidth: 345,
-             
       }}
-      >
+    >
       <CardActions>
         <Button onClick={handleClick}>
-
-      <CardMedia
-        sx={{ height: 200, width: 300, alignItems: "center", '&:hover': {
-          backgroundColor: 'primary.secondary',
-          opacity: [0.9, 0.8, 0.7],
-          justifyItems: "center"
-        },}}
-        image={image}
-        title={title}
-        />
-          </Button>
+          <CardMedia
+            sx={{
+              height: 200,
+              width: 300,
+              alignItems: "center",
+              "&:hover": {
+                backgroundColor: "primary.secondary",
+                opacity: [0.9, 0.8, 0.7],
+                justifyItems: "center",
+              },
+            }}
+            image={image}
+            title={title}
+          />
+        </Button>
       </CardActions>
       <CardContent>
         <Typography
@@ -107,7 +110,7 @@ const OnSaleCattle = ({
         >
           {category}
         </Typography>
-        
+
         <Typography variant="h5" component="div">
           {title}
         </Typography>
@@ -119,16 +122,16 @@ const OnSaleCattle = ({
       </CardContent>
       <CardActions>
         <Button
-        sx={{
-          '&:hover': {
-            backgroundColor: 'primary.secondary',
-            opacity: [0.9, 0.8, 0.7],
-          },
-        }}
+          sx={{
+            "&:hover": {
+              backgroundColor: "primary.secondary",
+              opacity: [0.9, 0.8, 0.7],
+            },
+          }}
           variant="primary"
           size="small"
           onClick={() => setIsExpanded(!isExpanded)}
-          >
+        >
           {buttonName}
         </Button>
       </CardActions>
@@ -141,19 +144,11 @@ const OnSaleCattle = ({
         }}
       >
         <CardContent>
-        <Typography>
-            Questions: {questions.map(
-              ({
-              description,
-              subject,
-
-            }) => ( <Questions
-              subject= {subject}
-              description= {description}
-            />
-            )
-            
-            )}
+          <Typography>
+            Questions:{" "}
+            {questions.map(({ description, subject }) => (
+              <Questions subject={subject} description={description} />
+            ))}
           </Typography>
         </CardContent>
       </Collapse>
@@ -167,14 +162,33 @@ const AllOnSaleCattle = () => {
   const isLarge = useMediaQuery("(min-width: 1620px)");
   const isNonMobile = useMediaQuery("(min-width: 1070px)");
   const isTab = useMediaQuery("(min-width: 740px)");
-  const theme = useTheme()
+  const theme = useTheme();
   const images = [
-          "https://res.cloudinary.com/diqqf3eq2/image/upload/v1595959131/person-2_ipcjws.jpg",
-          "https://res.cloudinary.com/diqqf3eq2/image/upload/v1586883417/person-3_ipa0mj.jpg",
-          "https://res.cloudinary.com/diqqf3eq2/image/upload/v1595959121/person-1_aufeoq.jpg",
-          "https://res.cloudinary.com/diqqf3eq2/image/upload/v1586883334/person-1_rfzshl.jpg",
-    ];
-  
+    "https://res.cloudinary.com/diqqf3eq2/image/upload/v1595959131/person-2_ipcjws.jpg",
+    "https://res.cloudinary.com/diqqf3eq2/image/upload/v1586883417/person-3_ipa0mj.jpg",
+    "https://res.cloudinary.com/diqqf3eq2/image/upload/v1595959121/person-1_aufeoq.jpg",
+    "https://res.cloudinary.com/diqqf3eq2/image/upload/v1586883334/person-1_rfzshl.jpg",
+  ];
+
+  const repeatedSkeletons = () => {
+    for (let i = 0; i < 9; i++) {
+      return (
+        <Card
+              sx={{
+                // backgroundImage: {profileImage}
+                backgroundColor: theme.palette.secondary,
+                borderRadius: "0.55rem",
+                borderColor: "darkgrey",
+                maxWidth: 345,
+              }}
+            >
+              <Skeleton variant="rectangular" width={210} height={118} />
+              <Skeleton />
+              <Skeleton width="60%" />
+            </Card>
+      );
+    }
+  }
 
   return (
     <Box m="1.5rem 2.5rem">
@@ -182,25 +196,29 @@ const AllOnSaleCattle = () => {
          justifyContent: "left"
       }} title="Cattle for Sale" subtitle="Currently available cattle for sale." /> */}
       {/* <BannerSlide imageArray={images}/> */}
-        <Box
-
-          backgroundColor={"theme.palette.secondary"}
-          mt="23px"
-          color={theme.palette.primary}
-          display="grid"
-          position={"static"}
-          gridTemplateColumns={isExtraLarge? "repeat(5, minmax(0, 1fr))":isLarge? "repeat(4, minmax(0, 1fr))" :  isNonMobile ? "repeat(3, minmax(0, 1fr))" : isTab? "repeat(2, minmax(0, 1fr))": "repeat(1, minmax(0, 1fr))" }  
-          // : isTab? {gridTemplateColumns:"repeat(2, minmax(0, 1fr))"}:
-          //  {gridTemplateColumns:"repeat(1, minmax(0, 1fr))"}}
-          justifyContent="space-between"
-          rowGap="25px"
-          columnGap="1.0%"
-          justifyItems={"center"}
-          alignItems={"baseline"}
-          // sx={{
-          //   "& > div": { gridColumn: isNonMobile ? "span 1" : isTab? "span 2": "span 4" }, alignItems:"baseline"
-          // }}
-        >
+      <Box
+        backgroundColor={"theme.palette.secondary"}
+        mt="23px"
+        color={theme.palette.primary}
+        display="grid"
+        position={"static"}
+        gridTemplateColumns={
+          isExtraLarge
+            ? "repeat(5, minmax(0, 1fr))"
+            : isLarge
+            ? "repeat(4, minmax(0, 1fr))"
+            : isNonMobile
+            ? "repeat(3, minmax(0, 1fr))"
+            : isTab
+            ? "repeat(2, minmax(0, 1fr))"
+            : "repeat(1, minmax(0, 1fr))"
+        }
+        justifyContent="space-between"
+        rowGap="25px"
+        columnGap="1.0%"
+        justifyItems={"center"}
+        alignItems={"baseline"}
+      >
         {data || !isLoading ? (
           data.map(
             ({
@@ -227,16 +245,139 @@ const AllOnSaleCattle = () => {
                 questions={questions}
                 location={location}
                 price={price}
-
               />
             )
           )
-      ) : (
-        "Loading..."
-      )}
-          
-        </Box>
-        
+        ) : (
+          <Box
+            color={theme.palette.primary}
+            // position={"static"}
+            gridTemplateColumns={
+              isExtraLarge
+                ? "repeat(5, minmax(0, 1fr))"
+                : isLarge
+                ? "repeat(4, minmax(0, 1fr))"
+                : isNonMobile
+                ? "repeat(3, minmax(0, 1fr))"
+                : isTab
+                ? "repeat(2, minmax(0, 1fr))"
+                : "repeat(1, minmax(0, 1fr))"
+            }
+            display="grid"
+            justifyContent="space-between"
+            rowGap="25px"
+            columnGap="1.0%"
+            // justifyItems={"center"}
+            // alignItems={"baseline"}
+          >
+            {repeatedSkeletons()}
+            {/* <Card
+              sx={{
+                // backgroundImage: {profileImage}
+                backgroundColor: theme.palette.secondary,
+                borderRadius: "0.55rem",
+                borderColor: "darkgrey",
+                maxWidth: 345,
+              }}
+            >
+              <Skeleton variant="rectangular" width={210} height={118} />
+              <Skeleton />
+              <Skeleton width="60%" />
+            </Card>
+            <Card
+              sx={{
+                // backgroundImage: {profileImage}
+                backgroundColor: theme.palette.secondary,
+                borderRadius: "0.55rem",
+                borderColor: "darkgrey",
+                maxWidth: 345,
+              }}
+            >
+              <Skeleton variant="rectangular" width={210} height={118} />
+              <Skeleton />
+              <Skeleton width="60%" />
+            </Card>
+            <Card
+              sx={{
+                // backgroundImage: {profileImage}
+                backgroundColor: theme.palette.secondary,
+                borderRadius: "0.55rem",
+                borderColor: "darkgrey",
+                maxWidth: 345,
+              }}
+            >
+              <Skeleton variant="rectangular" width={210} height={118} />
+              <Skeleton />
+              <Skeleton width="60%" />
+            </Card>
+            <Card
+              sx={{
+                // backgroundImage: {profileImage}
+                backgroundColor: theme.palette.secondary,
+                borderRadius: "0.55rem",
+                borderColor: "darkgrey",
+                maxWidth: 345,
+              }}
+            >
+              <Skeleton variant="rectangular" width={210} height={118} />
+              <Skeleton />
+              <Skeleton width="60%" />
+            </Card>
+            <Card
+              sx={{
+                // backgroundImage: {profileImage}
+                backgroundColor: theme.palette.secondary,
+                borderRadius: "0.55rem",
+                borderColor: "darkgrey",
+                maxWidth: 345,
+              }}
+            >
+              <Skeleton variant="rectangular" width={210} height={118} />
+              <Skeleton />
+              <Skeleton width="60%" />
+            </Card>
+            <Card
+              sx={{
+                // backgroundImage: {profileImage}
+                backgroundColor: theme.palette.secondary,
+                borderRadius: "0.55rem",
+                borderColor: "darkgrey",
+                maxWidth: 345,
+              }}
+            >
+              <Skeleton variant="rectangular" width={210} height={118} />
+              <Skeleton />
+              <Skeleton width="60%" />
+            </Card>
+            <Card
+              sx={{
+                // backgroundImage: {profileImage}
+                backgroundColor: theme.palette.secondary,
+                borderRadius: "0.55rem",
+                borderColor: "darkgrey",
+                maxWidth: 345,
+              }}
+            >
+              <Skeleton variant="rectangular" width={210} height={118} />
+              <Skeleton />
+              <Skeleton width="60%" />
+            </Card>
+            <Card
+              sx={{
+                // backgroundImage: {profileImage}
+                backgroundColor: theme.palette.secondary,
+                borderRadius: "0.55rem",
+                borderColor: "darkgrey",
+                maxWidth: 345,
+              }}
+            >
+              <Skeleton variant="rectangular" width={210} height={118} />
+              <Skeleton />
+              <Skeleton width="60%" />
+            </Card> */}
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };
