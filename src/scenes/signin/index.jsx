@@ -1,22 +1,22 @@
-import * as React from 'react';
-import { Field, Form, FormSpy } from 'react-final-form';
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Typography from 'components/Typography';
-import AppForm from 'components/AppForm';
-import { email, required } from 'form/validation';
-import RFTextField from 'form/RFTextField';
-import FormButton from 'form/FormButton';
-import FormFeedback from 'form/FormFeedback';
-import { useTheme } from '@emotion/react';
-import EFarm from 'components/EFarm';
+import * as React from "react";
+import { Field, Form, FormSpy } from "react-final-form";
+import Box from "@mui/material/Box";
+import Link from "@mui/material/Link";
+import Typography from "components/Typography";
+import AppForm from "components/AppForm";
+import { email, required } from "form/validation";
+import RFTextField from "form/RFTextField";
+import FormButton from "form/FormButton";
+import FormFeedback from "form/FormFeedback";
+import { useTheme } from "@emotion/react";
+import EFarm from "components/EFarm";
 
 function SignIn() {
   const [sent, setSent] = React.useState(false);
   const theme = useTheme();
 
   const validate = (values) => {
-    const errors = required(['email', 'password'], values);
+    const errors = required(["email", "password"], values);
 
     if (!errors.email) {
       const emailError = email(values.email);
@@ -35,18 +35,14 @@ function SignIn() {
   return (
     <React.Fragment>
       <AppForm>
-      <EFarm/>
+        <EFarm />
         <React.Fragment>
           <Typography variant="h4" gutterBottom marked="center" align="center">
             Sign In
           </Typography>
           <Typography variant="body2" align="center">
-            {'Not a member yet? '}
-            <Link
-              href={"/signup"}
-              align="center"
-              underline="always"
-            >
+            {"Not a member yet? "}
+            <Link href={"/signup"} align="center" underline="always">
               Sign Up here
             </Link>
           </Typography>
@@ -57,8 +53,12 @@ function SignIn() {
           validate={validate}
         >
           {({ handleSubmit: handleSubmit2, submitting }) => (
-            <Box component="form" onSubmit={handleSubmit2} noValidate sx={{ mt: 6,
-              }}>
+            <Box
+              component="form"
+              onSubmit={handleSubmit2}
+              noValidate
+              sx={{ mt: 6 }}
+            >
               <Field
                 autoComplete="email"
                 autoFocus
@@ -99,7 +99,7 @@ function SignIn() {
                 color="secondary"
                 fullWidth
               >
-                {submitting || sent ? 'In progress…' : 'Sign In'}
+                {submitting || sent ? "In progress…" : "Sign In"}
               </FormButton>
             </Box>
           )}
@@ -110,18 +110,18 @@ function SignIn() {
           </Link>
 
           <Box
-              sx={{
-                marginTop: "2rem",
-                alignItems: "center",
-              }}
-            >
-              {"© "}
-              <Link color="inherit" href="http://localhost:3000/">
-                eFarm
-              </Link>{" "}
-              {"All Rights Reserved "}
-              {new Date().getFullYear()}
-            </Box>
+            sx={{
+              marginTop: "2rem",
+              alignItems: "center",
+            }}
+          >
+            {"© "}
+            <Link color="inherit" href="http://localhost:3000/">
+              eFarm
+            </Link>{" "}
+            {"All Rights Reserved "}
+            {new Date().getFullYear()}
+          </Box>
         </Typography>
       </AppForm>
     </React.Fragment>
