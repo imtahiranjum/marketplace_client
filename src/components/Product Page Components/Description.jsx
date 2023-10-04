@@ -19,7 +19,7 @@ const Description = ({
   const [clickedBuyButton, setClickedBuyButton] = useState(false);
 
   return (
-    <Box className="description">
+    <div className="description">
       <Typography className="pre">{category}</Typography>
     <h1>{title}</h1>
       <p className="desc">
@@ -41,7 +41,7 @@ const Description = ({
           add to cart
         </button>
       </div>
-    </Box>
+    </div>
   );
 };
 
