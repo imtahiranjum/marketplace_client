@@ -1,9 +1,10 @@
 import logo from './logo.svg';
 import './index.css';
+import React from 'react';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { lightTheme, themeSettings } from './theme';
-import Products from './scenes/products';
+import AllOnSaleCattle from './scenes/products';
 import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
 import ProductDetails from 'scenes/productDetails';
@@ -13,7 +14,6 @@ import SignUp from 'scenes/signup';
 import ForgotPassword from 'scenes/forgotPassword';
 
   function App() {
-    const mode = useSelector((state) => state.global.mode)
     return (
     <div className="App">
       <BrowserRouter>
@@ -22,11 +22,12 @@ import ForgotPassword from 'scenes/forgotPassword';
           <Routes>
             <Route element={<Layout />}>
               <Route path='/' element = {<Navigate to="/products" replace />} />
-              <Route path='/products' element = {<Products/>} />
-              <Route path='/signin' element = {<SignIn/>} />
-              <Route path='/signup' element = {<SignUp/>} />
-              <Route path='/forgotpassword' element = {<ForgotPassword/>} />
+              <Route path='/products' element = {<AllOnSaleCattle/>} />
+              <Route path='/productdetails' element = {<ProductDetails/>} />
             </Route>
+            <Route path='/signin' element = {<SignIn/>} />
+            <Route path='/signup' element = {<SignUp/>} />
+            <Route path='/forgotpassword' element = {<ForgotPassword/>} />
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
