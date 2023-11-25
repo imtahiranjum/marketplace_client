@@ -14,16 +14,11 @@ export const globalSlice = createSlice({
     setMode: (state) => {
       // state.mode = state.mode === 'light' ? 'dark' : 'light';
     },
-    setUserId: (state, userId) => {
-      console.log(state.userId);
-      state.userId = userId.payload;
-      console.log(state.userId);
+    setUserId: (state, action) => {
+      state.userId = action.payload;
     },
-    setUserEmail: (state, userEmail) => {
-      console.log(state.userEmail);
-      state.userEmail = userEmail.payload;
-      console.log(state.userEmail);
-      state.userId = useGetUserIdQuery(userEmail);
+    setUserEmail: (state, action) => {
+      state.userEmail = action.payload;
     },
   },
 });
