@@ -36,7 +36,6 @@ function ResponsiveAppBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [action, setAction] = React.useState("");
-  const [userType, setUserType] = React.useState(data ? data.roles : "");
   const [userName, setUserName] = React.useState(
     data ? data.first_name : <Skeleton width={30} />
   );
@@ -46,17 +45,24 @@ function ResponsiveAppBar() {
   const [logoutUser, result] = useLogoutUserMutation();
   const [isSignedIn, setIsSignedIn] = React.useState(userEmail ? true : false);
   const [isSeller, setIsSeller] = React.useState(false);
+  const [isBuyer, setIsBuyer] = React.useState(false);
 
   React.useEffect(() => {
     if (data === undefined) {
       setUserName(<Skeleton width={80} />);
     } else {
       setUserName(data.first_name);
-      setUserType(data.roles);
+    }
+  }, [isSuccess]);
+
+  React.useEffect(() => {
+    if (data && !isLoading) {
       data.roles.map((role) => {
-        console.log(role);
         if (role == "seller") {
           setIsSeller(true);
+        }
+        if (role == "buyer") {
+          setIsBuyer(true);
         }
       });
     }
@@ -64,7 +70,7 @@ function ResponsiveAppBar() {
 
   React.useEffect(() => {
     if (data && !isLoading) {
-      !isSignedIn
+      (!isSignedIn || !isSeller)
         ? setSwitchButtonAction(
             <Button
               component="label"
@@ -81,23 +87,24 @@ function ResponsiveAppBar() {
               Become Seller!
             </Button>
           )
-        : isSeller? setSwitchButtonAction(
-          <Button
-            component="label"
-            variant="contained"
-            onClick={handleSwitchDashboard}
-            sx={{
-              borderRadius: 3,
-              color: "white",
-            }}
-            color="secondary"
-            disabled={false}
-            size="medium"
-          >
-            Your Dashboard
-          </Button>
+        : isSeller
+        ? setSwitchButtonAction(
+            <Button
+              component="label"
+              variant="contained"
+              onClick={handleSwitchDashboard}
+              sx={{
+                borderRadius: 3,
+                color: "white",
+              }}
+              color="secondary"
+              disabled={false}
+              size="medium"
+            >
+              Your Dashboard
+            </Button>
           )
-          : setSwitchButtonAction("");
+        : setSwitchButtonAction("");
     }
   }, [isSeller, isSuccess, isSignedIn]);
 
@@ -159,6 +166,15 @@ function ResponsiveAppBar() {
     dispatch(setUserEmail(""));
     dispatch(setUserId(""));
   };
+
+  React.useEffect(() => {
+    if (action == "Profile") {
+      navigate("/userprofile", {
+        replace: false,
+        state: { userEmail: userEmail },
+      });
+    }
+  }, [action]);
 
   React.useEffect(() => {
     if (action == "Logout") {
@@ -357,7 +373,25 @@ function ResponsiveAppBar() {
               >
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Tooltip title="Open settings">
-                    <Avatar alt="" src="/static/images/avatar/2.jpg" />
+                    {data && !isLoading ? (
+                      (data.profile.profile_image !== undefined) ? ( 
+                        <Avatar alt="" src={data.profile.profile_image} />
+                      ):(
+                        <Avatar alt="" src={data.name} />
+                      )
+                      
+                    ) : (
+                      <Skeleton
+                        variant="circular"
+                        width={30}
+                        height={30}
+                        sx={{
+                          marginRight: "0.5rem",
+                          marginLeft: "0.5rem",
+                          color: "white",
+                        }}
+                      />
+                    )}
                   </Tooltip>
                   <Typography
                     sx={{
@@ -369,31 +403,35 @@ function ResponsiveAppBar() {
                     {userName}
                   </Typography>
                 </IconButton>
-                <Menu
-                  sx={{ mt: "45px" }}
-                  id="menu-appbar"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
-                >
-                  {settings.map((setting) => (
-                    <MenuItem
-                      key={setting}
-                      onClick={() => handleSetAction(setting)}
-                    >
-                      <Typography textAlign="center">{setting}</Typography>
-                    </MenuItem>
-                  ))}
-                </Menu>
+                {data && !isLoading ? (
+                  <Menu
+                    sx={{ mt: "45px" }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                  >
+                    {settings.map((setting) => (
+                      <MenuItem
+                        key={setting}
+                        onClick={() => handleSetAction(setting)}
+                      >
+                        <Typography textAlign="center">{setting}</Typography>
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                ) : (
+                  <></>
+                )}
               </Box>
             ) : (
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
