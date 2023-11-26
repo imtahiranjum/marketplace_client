@@ -6,7 +6,13 @@ import React from "react";
 function FAQs({ questions, answers }) {
   const theme = useTheme();
   return (
-    <div>
+    <Card
+        sx={{
+          flex: 1,
+          backgroundColor: theme.palette.secondary,
+          padding: "1rem",
+        }}
+      >
       <Typography
         variant="h6"
         sx={{
@@ -67,7 +73,7 @@ function FAQs({ questions, answers }) {
                 No queries yet
             </Typography>}
       
-    </div>
+    </Card>
   );
 }
 
