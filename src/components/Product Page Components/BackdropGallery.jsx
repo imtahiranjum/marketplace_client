@@ -1,22 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Backdrop, IconButton } from "@mui/material";
-import prod1 from "../../assets/Pictures/image-product-1.jpg";
-import prod3 from "../../assets/Pictures/image-product-3.jpg";
-import prod2 from "../../assets/Pictures/image-product-2.jpg";
-import prod4 from "../../assets/Pictures/image-product-4.jpg";
-
-import thumb1 from "../../assets/Pictures/image-product-1-thumbnail.jpg";
-import thumb2 from "../../assets/Pictures/image-product-2-thumbnail.jpg";
-import thumb3 from "../../assets/Pictures/image-product-3-thumbnail.jpg";
-import thumb4 from "../../assets/Pictures/image-product-4-thumbnail.jpg";
+import { Backdrop, Box, IconButton } from "@mui/material";
 
 import CloseIcon from "./Icons/CloseIcon";
 import PreviousIcon from "./Icons/PreviousIcon";
 import NextIcon from "./Icons/NextIcon";
 
-const IMAGES = [prod1, prod2, prod3, prod4];
-const THUMBS = [thumb1, thumb2, thumb3, thumb4];
-const BackdropGallery = ({ open, handleClose, currentPassedImage }) => {
+const BackdropGallery = ({ IMAGES, THUMBS, open, handleClose, currentPassedImage }) => {
+
   const [backdropImage, setBackdropImage] = useState(currentPassedImage);
   const [currentPassedImageIndex, setCurrentPassedImageIndex] = useState(1);
 
@@ -69,14 +59,14 @@ const BackdropGallery = ({ open, handleClose, currentPassedImage }) => {
       }}
       open={open}
     >
-      <section className="backdrop-content">
+      <Box className="backdrop-content">
         <IconButton
           onClick={handleClose}
           sx={{ color: "#fff", bgcolor: "transparent", alignSelf: "flex-end" }}
         >
           <CloseIcon fillColor={"#fff"} />
         </IconButton>
-        <div className="image">
+        <Box className="image">
           <IconButton
             className="icon-button-prev"
             disableRipple
@@ -108,15 +98,17 @@ const BackdropGallery = ({ open, handleClose, currentPassedImage }) => {
             <NextIcon />
           </IconButton>
           <img
+            width={720} 
+            height={480}
             src={backdropImage}
             alt="selected-product"
             style={{ cursor: "auto" }}
           />
-        </div>
-        <div className="thumbnails">
+        </Box>
+        <Box className="thumbnails">
           {THUMBS.map((th, index) => {
             return (
-              <div
+              <Box
                 className="img-holder-backd"
                 key={index}
                 onClick={(e) => {
@@ -125,17 +117,17 @@ const BackdropGallery = ({ open, handleClose, currentPassedImage }) => {
                   e.currentTarget.childNodes[0].classList.toggle("activated");
                 }}
               >
-                <div
+                <Box
                   className={`outlay ${
                     index === currentPassedImageIndex && "activated"
                   }`}
-                ></div>
-                <img src={th} alt={`product-${index + 1}`} />
-              </div>
+                ></Box>
+                <img width={75} height={40} src={th} alt={`product-${index + 1}`} />
+              </Box>
             );
           })}
-        </div>
-      </section>
+        </Box>
+      </Box>
     </Backdrop>
   );
 };
