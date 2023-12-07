@@ -6,25 +6,36 @@ import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import { io } from "socket.io-client";
 import ResponsiveAppBar from "components/Appbar";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   useGetUserByEmailQuery,
   useGetUserIdQuery,
   useGetUserQuery,
 } from "state/api";
+import { useLocation } from "react-router-dom";
 
 export default function Chat() {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const sellerId = location.state.seller;
+  const userEmail = useSelector((state) => state.global.userEmail);
+  const user = useGetUserByEmailQuery(userEmail);
   const [conversations, setConversations] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [userId, setUserId] = useState("");
+  // const [sellerId, setSellerId] = useState("");
   const socket = useRef();
-  const dispatch = useDispatch();
-  const userId = dispatch((state) => state.userId);
-  const { data, isLoading, isSuccess } = useGetUserQuery(userId);
   const scrollRef = useRef();
+
+  useEffect(() => {
+    if (user.isSuccess && !user.isLoading) {
+      setUserId(user.data.id);
+    }
+  }, [user.isSuccess]);
 
   useEffect(() => {
     socket.current = io("ws://localhost:8900");
@@ -46,7 +57,7 @@ export default function Chat() {
   useEffect(() => {
     const getConversations = async () => {
       try {
-        const res = await axios.get("/conversations/" + userId);
+        const res = await axios.get("http://localhost:5001/conversations/" + userId);
         setConversations(res.data);
       } catch (err) {
         console.log(err);
@@ -59,7 +70,7 @@ export default function Chat() {
     const getMessages = async () => {
       try {
         const res = await axios.get(
-          "/messages/" + currentChat ? currentChat._id : null
+          "http://localhost:5001/messages/" + currentChat ? currentChat._id : null
         );
         setMessages(res.data);
       } catch (err) {
@@ -86,7 +97,7 @@ export default function Chat() {
     });
 
     try {
-      const res = await axios.post("/messages", message);
+      const res = await axios.post("http://localhost:5001/messages", message);
       setMessages([...messages, res.data]);
       setNewMessage("");
     } catch (err) {
@@ -94,13 +105,37 @@ export default function Chat() {
     }
   };
 
-  // useEffect(() => {
-  //   scrollRef.current
-  //     ? () => {
-  //         scrollRef.scrollIntoView({ behavior: "smooth" });
-  //       }
-  //     : null;
-  // }, [messages]);
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  const findConversationElseCreateNew = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5001/conversations/find/${userId}/${sellerId}`);
+      setCurrentChat(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+    if (currentChat === null) {
+      const newConversation = {
+        sender: userId,
+        receiver: sellerId,
+      };
+      const res = await axios.post("http://localhost:5001/conversations", newConversation);
+      setCurrentChat(res.data);
+    }
+  };
+
+  useEffect(() => {
+    while (userId === null) {
+      console.log("waiting for user id");
+    }
+    if (conversations.length === 0) {
+      findConversationElseCreateNew();
+    }
+  }, [conversations]);
 
   return (
     <React.Fragment>
@@ -108,7 +143,7 @@ export default function Chat() {
       <div className="messenger">
         <div className="chatMenu">
           <div className="chatMenuWrapper">
-            <input placeholder="Search for friends" className="chatMenuInput" />
+            <input placeholder="Search Conversation" className="chatMenuInput" />
             {conversations.map((c) => (
               <div onClick={() => setCurrentChat(c)}>
                 <Conversation conversation={c} currentUser={userId} />
@@ -141,7 +176,7 @@ export default function Chat() {
               </>
             ) : (
               <span className="noConversationText">
-                Open a conversation to start a chat.
+                Select conversation to start a chat.
               </span>
             )}
           </div>

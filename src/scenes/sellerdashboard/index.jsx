@@ -1,43 +1,70 @@
 import * as React from "react";
-import { Field, Form, FormSpy } from "react-final-form";
-import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
-import Typography from "components/Typography";
-import AppForm from "components/AppForm";
 import { email, required } from "form/validation";
-import RFTextField from "form/RFTextField";
-import FormButton from "form/FormButton";
-import FormFeedback from "form/FormFeedback";
-import { useTheme } from "@emotion/react";
-import EFarm from "components/EFarm";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useLoginUserMutation } from "state/api";
-import Snackbar from "components/Snackbar";
-import { Alert } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  useGetOnSaleCattleDetailsQuery,
+  useGetOnSaleCattleQuery,
+  useGetSellerByEmailQuery,
+  useGetSpecificOnSaleCattleQuery,
+} from "state/api";
 import { setUserEmail } from "state";
+import {
+  Avatar,
+  Box,
+  ButtonGroup,
+  Card,
+  Container,
+  Paper,
+  Rating,
+  Skeleton,
+  Button,
+  useMediaQuery,
+} from "@mui/material";
+import Typography from "components/Typography";
+import Header from "components/Header";
+import { Add, Edit, EditAttributes } from "@mui/icons-material";
+import CardSkeletonBase from "components/CardSkeltonBase";
+import SmallHeader from "components/SmallHeader";
+import { OnSaleCattle } from "scenes/onsalecattle";
+import { useTheme } from "@emotion/react";
 
-function RegisterAsSeller() {
+export const OnSaleCattleGetter = ({ onSaleCattleId }) => {
+  const { data, isLoading, isSuccess } =
+    useGetSpecificOnSaleCattleQuery(onSaleCattleId);
+  return data || (!isLoading && isSuccess) ? (
+    <OnSaleCattle
+      key={data._id}
+      _id={data._id}
+      title={data.title}
+      images={data.images}
+      description={data.description}
+      category={data.category}
+      seller_info={data.seller_info}
+      contact={data.contact}
+      questions={data.questions}
+      location={data.location}
+      price={data.price}
+    />
+  ) : (
+    <CardSkeletonBase repeatingCount={1} />
+  );
+};
+
+function SellerDashboard() {
   const [sent, setSent] = React.useState(false);
-  const [newEmail, setNewEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
   const [alertOpen, setAlertOpen] = React.useState(false);
-  const [loginUser] = useLoginUserMutation();
+  const [editButton, setEditButton] = React.useState(false);
+  const [addCattleToSaleButton, setAddCattleToSaleButton] =
+    React.useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const validate = (values) => {
-    const errors = required(["email", "password"], values);
-
-    if (!errors.email) {
-      const emailError = email(values.email);
-      if (emailError) {
-        errors.email = emailError;
-      }
-    }
-
-    return errors;
-  };
+  const userEmail = useSelector((state) => state.global.userEmail);
+  const { data, isLoading, isSuccess } = useGetSellerByEmailQuery(userEmail);
+  const isExtraLarge = useMediaQuery("(min-width: 1920px)");
+  const isLarge = useMediaQuery("(min-width: 1620px)");
+  const isNonMobile = useMediaQuery("(min-width: 1070px)");
+  const isTab = useMediaQuery("(min-width: 740px)");
+  const theme = useTheme();
 
   const handleAlertClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -47,143 +74,364 @@ function RegisterAsSeller() {
     setAlertOpen(false);
   };
 
-  const handleSubmit = async () => {
-    try {
-      const payload = await loginUser({
-        email: newEmail,
-        password: password,
-      });
-      if (!payload.error) {
-        dispatch(setUserEmail(newEmail));
-        setSent(true);
-      } else {
-        setAlertOpen(true)
-        setSent(false);
-      }
-    } catch (err) {}
-  };
+  // React.useEffect(() => {
+  //   navigate("/addcattletosale", { replace: true });
+  // }, [addCattleToSaleButton]);
 
-  React.useEffect(()=> {
-    (sent? navigate("/onsalecattle", {
-      replace: false,
-      state: { email: newEmail },
-    }) : setAlertOpen(false)
-    )
-  }, [sent ])
+  // const handleSubmit = async () => {
+  //   try {
+  //     const payload = await loginUser({
+  //       email: newEmail,
+  //       password: password,
+  //     });
+  //     if (!payload.error) {
+  //       dispatch(setUserEmail(newEmail));
+  //       setSent(true);
+  //     } else {
+  //       setAlertOpen(true)
+  //       setSent(false);
+  //     }
+  //   } catch (err) {}
+  // };
+
+  // React.useEffect(()=> {
+  //   (sent? navigate("/onsalecattle", {
+  //     replace: false,
+  //     state: { email: newEmail },
+  //   }) : setAlertOpen(false)
+  //   )
+  // }, [sent ])
 
   return (
     <React.Fragment>
-      <AppForm>
-        <Box sx={{ width: 500 }}>
-          <Snackbar
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            open={alertOpen}
-            onClose={handleAlertClose}
-            autoHideDuration={6000}
-            key={"bottomcenter"}
-          >
-            <Alert
-              onClose={handleAlertClose}
-              severity="error"
-              sx={{ width: "100%" }}
-            >
-              Wrong Email or Password
-            </Alert>
-          </Snackbar>
-        </Box>
-        <EFarm />
-        <React.Fragment>
-          <Typography variant="h4" gutterBottom marked="center" align="center">
-            Sign In
-          </Typography>
-          <Typography variant="body2" align="center">
-            {"Not a member yet? "}
-            <Link href={"/signup"} align="center" underline="always">
-              Sign Up here
-            </Link>
-          </Typography>
-        </React.Fragment>
-        <Form
-          onSubmit={handleSubmit}
-          subscription={{ submitting: true }}
-          validate={validate}
-        >
-          {({ handleSubmit: handleSubmit2, submitting }) => (
+      <Box display={"flex"} justifyContent={"left"} alignItems={"center"}>
+        <Box>
+          {data || (!isLoading && isSuccess) ? (
             <Box
-              component="form"
-              onSubmit={handleSubmit2}
-              noValidate
-              sx={{ mt: 6 }}
+              display={"flex"}
+              flex={4}
+              flexDirection={"column"}
+              alignItems={"center"}
+              justifyContent={"left"}
             >
-              <Field
-                autoComplete="email"
-                autoFocus
-                component={RFTextField}
-                disabled={submitting || sent}
-                fullWidth
-                label="Email"
-                margin="normal"
-                name="email"
-                required
+              {data.profile && data.profile.profile_image ? (
+                <Avatar
+                  src={data.profile.profile_image}
+                  sx={{
+                    width: 250,
+                    height: 250,
+                    px: "2rem",
+                    paddingTop: "1rem",
+                    paddingBottom: "1rem",
+                    mx: "3rem",
+                    marginTop: "0.5rem",
+                    marginBottom: "1rem",
+                  }}
+                />
+              ) : (
+                <Avatar
+                  src={data.seller.name}
+                  sx={{
+                    width: 250,
+                    height: 250,
+                    px: "2rem",
+                    paddingTop: "1rem",
+                    paddingBottom: "1rem",
+                    mx: "3rem",
+                    marginTop: "0.5rem",
+                    marginBottom: "1rem",
+                  }}
+                />
+              )}
+              <Rating
+                name="size-large"
+                defaultValue={0}
+                value={data.seller.rating}
                 size="large"
-                onChange={(e) => setNewEmail(e.target.value)}
+                readOnly
+                sx={{
+                  marginBottom: "1rem",
+                }}
               />
-              <Field
-                fullWidth
-                size="large"
-                component={RFTextField}
-                disabled={submitting || sent}
-                required
-                name="password"
-                autoComplete="current-password"
-                label="Password"
-                type="password"
-                margin="normal"
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <FormSpy subscription={{ submitError: true }}>
-                {({ submitError }) =>
-                  submitError ? (
-                    <FormFeedback error sx={{ mt: 2 }}>
-                      {submitError}
-                    </FormFeedback>
-                  ) : null
-                }
-              </FormSpy>
-              <FormButton
-                sx={{ mt: 3, mb: 2 }}
-                disabled={submitting || sent}
-                size="medium"
-                color="secondary"
-                fullWidth
+            </Box>
+          ) : (
+            <Box
+              display={"flex"}
+              flex={4}
+              flexDirection={"column"}
+              alignItems={"center"}
+            >
+              <Box
+                sx={{
+                  px: "2rem",
+                  paddingTop: "1rem",
+                  paddingBottom: "1rem",
+                  mx: "3rem",
+                  marginTop: "0.5rem",
+                  marginBottom: "1rem",
+                }}
               >
-                {submitting || sent ? "In progress…" : "Sign In"}
-              </FormButton>
+                <Skeleton variant="circular" width={250} height={250} />
+              </Box>
+              <Skeleton variant="rectangular" width={250} height={50} />
             </Box>
           )}
-        </Form>
-        <Typography align="center">
-          <Link underline="always" href="/forgotpassword/">
-            Forgot password?
-          </Link>
-
-          <Box
+        </Box>
+        <Box flex={8}>
+          <Card
             sx={{
-              marginTop: "2rem",
-              alignItems: "center",
+              flex: 1,
+              padding: "1.5rem",
+              margin: "auto",
             }}
           >
-            {"© "}
-            <Link color="inherit" href="http://localhost:3000/">
-              eFarm
-            </Link>{" "}
-            {"All Rights Reserved "}
-            {new Date().getFullYear()}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                flexGrow: 1,
+                marginBottom: "2rem",
+              }}
+            >
+              <Button
+                variant="contained"
+                startIcon={<Edit />}
+                onClick={() => {
+                  // setEditButton(true);
+                }}
+                sx={{
+                  px: "1.1rem",
+                }}
+              >
+                Edit Info
+              </Button>
+
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() => {
+                  navigate("/addcattletosale", {
+                    replace: false,
+                    state: { seller_info: data.seller._id },
+                  });
+                }}
+                sx={{
+                  px: "1.1rem",
+                }}
+              >
+                Add Cattle for Sale
+              </Button>
+            </Box>
+            {data || (!isLoading && isSuccess) ? (
+              <SmallHeader title={data.seller.name} />
+            ) : (
+              <Box
+                flex={8}
+                sx={{
+                  py: "2rem",
+                }}
+              >
+                <Skeleton
+                  width={150}
+                  height={50}
+                  sx={{
+                    mb: "5px",
+                    justifyContent: "left",
+                  }}
+                />
+                <Skeleton
+                  width={100}
+                  height={30}
+                  sx={{
+                    mb: "5px",
+                    justifyContent: "left",
+                  }}
+                />
+              </Box>
+            )}
+            <Typography
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
+              Description:
+            </Typography>
+            {data || (!isLoading && isSuccess) ? (
+              <Typography>{data.seller.description}</Typography>
+            ) : (
+              <Box>
+                <Skeleton
+                  animation="wave"
+                  sx={{
+                    margin: "0.2rem",
+                  }}
+                  height={20}
+                />
+                <Skeleton
+                  animation="wave"
+                  sx={{
+                    margin: "0.2rem",
+                  }}
+                  height={20}
+                />
+                <Skeleton
+                  animation="wave"
+                  sx={{
+                    margin: "0.2rem",
+                  }}
+                  height={20}
+                />
+                <Skeleton
+                  animation="wave"
+                  sx={{
+                    margin: "0.2rem",
+                  }}
+                  height={20}
+                />
+              </Box>
+            )}
+            <Box>
+              <Typography
+                sx={{
+                  fontWeight: "bold",
+                  marginBottom: "0.5rem",
+                  marginTop: "1.5rem",
+                }}
+              >
+                Location:
+              </Typography>
+              <Typography
+                sx={{
+                  marginBottom: "0.5rem",
+                }}
+              >
+                {data || (!isLoading && isSuccess) ? (
+                  data.seller.contact_info.address
+                ) : (
+                  <Skeleton width={170} />
+                )}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography
+                sx={{
+                  fontWeight: "bold",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                Total Cattle On Sale:{" "}
+                {data ? (
+                  data.seller.cattle_on_sale ? (
+                    data.seller.cattle_on_sale.length
+                  ) : (
+                    <Typography>No Data</Typography>
+                  )
+                ) : (
+                  <></>
+                )}
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: "bold",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                Boarding Service:{" "}
+                {/* {data ? (
+                  data.seller.boarding_service
+                ) : (
+                  <Typography>No Data</Typography>
+                )} */}
+              </Typography>
+            </Box>
+          </Card>
+        </Box>
+      </Box>
+      {data || (!isLoading && isSuccess) ? (
+        data.seller.isBoardingService ? (
+          <Box
+            justifyContent={"space-evenly"}
+            alignItems={"center"}
+            display={"flex"}
+          >
+            <Card
+              sx={{
+                flex: 1,
+                marginBottom: "1rem",
+                mx: "1rem",
+                p: "1rem",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "2rem",
+                }}
+              >
+                Boarding Service
+              </Typography>
+              {/* {data.seller.boarding_service} */}
+            </Card>
           </Box>
-        </Typography>
-      </AppForm>
+        ) : null
+      ) : null}
+      <Box display={"flex"}>
+        <Card
+          sx={{
+            flex: 1,
+            marginBottom: "1rem",
+            mx: "1rem",
+            p: "1rem",
+          }}
+        >
+          <Typography
+            flex={1}
+            sx={{
+              fontWeight: "bold",
+              fontSize: "1.5rem",
+            }}
+          >
+            Cattle On Sale
+          </Typography>
+          <Box
+            backgroundColor={theme.palette.secondary}
+            mt="23px"
+            color={theme.palette.primary}
+            display="grid"
+            // position={"static"}
+            gridTemplateColumns={
+              isExtraLarge
+                ? "repeat(5, minmax(0, 1fr))"
+                : isLarge
+                ? "repeat(4, minmax(0, 1fr))"
+                : isNonMobile
+                ? "repeat(3, minmax(0, 1fr))"
+                : isTab
+                ? "repeat(2, minmax(0, 1fr))"
+                : "repeat(1, minmax(0, 1fr))"
+            }
+            justifyContent="space-between"
+            rowGap="25px"
+            columnGap="1.0%"
+            // justifyItems={"center"}
+            // alignItems={"baseline"}
+          >
+            {data || (!isLoading && isSuccess) ? (
+              data.seller.cattle_on_sale ? (
+                data.seller.cattle_on_sale.map((onSaleCattleId) => (
+                  <OnSaleCattleGetter onSaleCattleId={onSaleCattleId} />
+                ))
+              ) : (
+                <Typography>No Cattle On Sale</Typography>
+              )
+            ) : (
+              <></>
+            )}
+          </Box>
+        </Card>
+      </Box>
     </React.Fragment>
   );
 }
 
-export default RegisterAsSeller;
+export default SellerDashboard;

@@ -10,10 +10,21 @@ import FormButton from "form/FormButton";
 import FormFeedback from "form/FormFeedback";
 import { useTheme } from "@emotion/react";
 import EFarm from "components/EFarm";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useLoginUserMutation } from "state/api";
+import Snackbar from "components/Snackbar";
+import { Alert } from "@mui/material";
+import { setUserEmail, setIsLoggedIn } from "state";
 
 function SignIn() {
   const [sent, setSent] = React.useState(false);
-  const theme = useTheme();
+  const [newEmail, setNewEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [alertOpen, setAlertOpen] = React.useState(false);
+  const [loginUser] = useLoginUserMutation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const validate = (values) => {
     const errors = required(["email", "password"], values);
@@ -28,13 +39,59 @@ function SignIn() {
     return errors;
   };
 
-  const handleSubmit = () => {
-    setSent(true);
+  const handleAlertClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setAlertOpen(false);
   };
+
+  const handleSubmit = async () => {
+    try {
+      const payload = await loginUser({
+        email: newEmail,
+        password: password,
+      });
+      if (!payload.error) {
+        dispatch(setUserEmail(newEmail));
+        dispatch(setIsLoggedIn(true))
+        setSent(true);
+      } else {
+        setAlertOpen(true)
+        setSent(false);
+      }
+    } catch (err) {}
+  };
+
+  React.useEffect(()=> {
+    (sent? navigate("/onsalecattle", {
+      replace: false,
+      state: { email: newEmail },
+    }) : setAlertOpen(false)
+    )
+  }, [sent ])
 
   return (
     <React.Fragment>
       <AppForm>
+        <Box sx={{ width: 500 }}>
+          <Snackbar
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            open={alertOpen}
+            onClose={handleAlertClose}
+            autoHideDuration={6000}
+            key={"bottomcenter"}
+          >
+            <Alert
+              onClose={handleAlertClose}
+              severity="error"
+              sx={{ width: "100%" }}
+            >
+              Wrong Email or Password
+            </Alert>
+          </Snackbar>
+        </Box>
         <EFarm />
         <React.Fragment>
           <Typography variant="h4" gutterBottom marked="center" align="center">
@@ -70,6 +127,7 @@ function SignIn() {
                 name="email"
                 required
                 size="large"
+                onChange={(e) => setNewEmail(e.target.value)}
               />
               <Field
                 fullWidth
@@ -82,6 +140,7 @@ function SignIn() {
                 label="Password"
                 type="password"
                 margin="normal"
+                onChange={(e) => setPassword(e.target.value)}
               />
               <FormSpy subscription={{ submitError: true }}>
                 {({ submitError }) =>

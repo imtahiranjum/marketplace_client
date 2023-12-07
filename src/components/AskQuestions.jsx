@@ -18,31 +18,32 @@ import {
 } from "state/api";
 
 const AskQuestions = ({ onsalecattle, seller }) => {
-  const theme = useTheme();
   const userEmail = useSelector((state) => state.global.userEmail);
   const isLoggedIn = useSelector((state) => state.global.isLoggedIn);
   const user = useGetUserByEmailQuery(userEmail);
-  const sellerRetrieved = useGetSellerByIdQuery(seller);
+  const {data, isLoading, isSuccess} = useGetSellerByIdQuery(seller);
   const [addQuestion] = useAddQuestionMutation();
   const [toQuestion, setToQuestion] = React.useState(false);
   const [sellerEmail, setSellerEmail] = React.useState("");
   const [description, setDescription] = React.useState("");
+  const theme = useTheme();
 
   //   const [userId, setUserId] = React.useState("");
 
   useEffect(() => {
-    if (!sellerRetrieved.isLoading && sellerRetrieved.isSuccess) {
-      setSellerEmail(sellerRetrieved.data.seller.user.email);
+    if (data && !isLoading && isSuccess) {
+      setSellerEmail(data.seller.user.email);
     }
-  }, [sellerRetrieved.isSuccess]);
+  }, [isLoading, isSuccess]);
 
   useEffect(() => {
-    if (!user.isLoading && user.isSuccess) {
-        if (user.data.id !== seller) {
+    if (data && !user.isLoading && user.isSuccess) {
+      console.log(user.data.email, sellerEmail);
+        if (user.data.email !== sellerEmail) {
           setToQuestion(true);
         }
     }
-  }, [user.isSuccess]);
+  }, [sellerEmail]);
 
   const handleSubmit = async () => {
     const payload = await addQuestion({
@@ -50,6 +51,7 @@ const AskQuestions = ({ onsalecattle, seller }) => {
       description: description,
       user: user.data.id,
     });
+    setDescription("");
   };
 
   return isLoggedIn && toQuestion ? (
@@ -73,6 +75,7 @@ const AskQuestions = ({ onsalecattle, seller }) => {
           name="askQuestion"
           label="Ask Question"
           type="askQuestion"
+          value={description}
           multiline
           rows={2}
           sx={{

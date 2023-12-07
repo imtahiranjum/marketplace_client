@@ -11,11 +11,15 @@ import FormButton from "form/FormButton";
 import FormFeedback from "form/FormFeedback";
 import { useCreateUserMutation } from "state/api";
 import { useState } from "react";
-import { Navigate, redirect } from "react-router-dom";
-import AllOnSaleCattle from "scenes/products";
+import { Navigate, redirect, useLocation, useNavigate } from "react-router-dom";
+import AllOnSaleCattle from "scenes/onsalecattle";
 import EFarm from "components/EFarm";
+import { useDispatch } from "react-redux";
+import { setUserEmail } from "state";
 
 function SignUp() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [sent, setSent] = React.useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -23,6 +27,8 @@ function SignUp() {
   const [password, setPassword] = useState("");
   const [passwordVerify, setPasswordVerify] = useState("");
   const [createUser] = useCreateUserMutation();
+  const location = useLocation();
+  const context = location.state;
 
   const validate = (values) => {
     const errors = required(
@@ -41,37 +47,50 @@ function SignUp() {
   };
 
   const handleSubmit = async () => {
-    setSent(true);
-    console.log(firstName, lastName, newEmail, password, passwordVerify);
-    try{
-    const payload = await createUser({
-      firstName: firstName,
-      lastName: lastName,
-      email: newEmail,
-      password: password,
-      passwordVerify: passwordVerify,
-    });
-    console.log("User Created");
-    return (
-      <Navigate to="/products" replace />
-    )
-  }
-  catch(error){
-    console.log("Error Occurred", error);
-
-  }
+    console.log(firstName, lastName, newEmail);
+    try {
+      const payload = await createUser({
+        firstName: firstName,
+        lastName: lastName,
+        email: newEmail,
+        password: password,
+        passwordVerify: passwordVerify,
+      });
+      if (!payload.error) {
+        dispatch(setUserEmail(newEmail));
+        setSent(true);
+        navigate("/onsalecattle", {
+          replace: false,
+          state: { email: newEmail, context: context },
+        });
+      } else {
+        setSent(false);
+      }
+    } catch (error) {
+      console.log("Error Occurred", error);
+    }
   };
 
   return (
     <React.Fragment>
       <AppForm>
-        <EFarm/>
+        <EFarm />
         <React.Fragment>
           <Typography variant="h3" gutterBottom marked="center" align="center">
             Sign Up
           </Typography>
           <Typography variant="body2" align="center">
-            <Link href="/signin" underline="always">
+            <Link
+              to="/signin"
+              underline="always"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/signin", {
+                  replace: true,
+                  state: { context: context },
+                });
+              }}
+            >
               Already have an account?
             </Link>
           </Typography>
@@ -172,23 +191,21 @@ function SignUp() {
           )}
         </Form>
 
-          <Box
-              sx={{
-                marginTop: "2rem",
-                display: "flex",
-                // alignContent: "center",
-                justifyContent: "center"
-              }}
-            >
-              {"© "}
-              <Link color="inherit" href="http://localhost:3000/">
-                eFarm 
-              </Link>
-              {" "}
-              {" All Rights Reserved. "}
-              {new Date().getFullYear()}
-            </Box>
-
+        <Box
+          sx={{
+            marginTop: "2rem",
+            display: "flex",
+            // alignContent: "center",
+            justifyContent: "center",
+          }}
+        >
+          {"© "}
+          <Link color="inherit" href="http://localhost:3000/">
+            eFarm
+          </Link>{" "}
+          {" All Rights Reserved. "}
+          {new Date().getFullYear()}
+        </Box>
       </AppForm>
     </React.Fragment>
   );

@@ -10,8 +10,13 @@ import FormButton from "form/FormButton";
 import FormFeedback from "form/FormFeedback";
 import EFarm from "components/EFarm";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useGetSellerQuery, useLoginUserMutation } from "state/api";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  useGetSellerByEmailQuery,
+  useGetSellerByIdQuery,
+  useGetSellerQuery,
+  useLoginUserMutation,
+} from "state/api";
 import Snackbar from "components/Snackbar";
 import {
   Alert,
@@ -27,19 +32,32 @@ import FlexBetween from "components/FlexBetween";
 import Header from "components/Header";
 import Star from "components/Star";
 import CardSkeletonBase from "components/CardSkeltonBase";
+import SmallHeader from "components/SmallHeader";
+import SellerDashboard, { OnSaleCattleGetter } from "scenes/sellerdashboard";
 
 function SellerInfo() {
-  // const location = useLocation();
-  // const recievedProps = location.state.propsToPass;
-  const { data, isLoading, isSuccess } = useGetSellerQuery("asdkjl83j");
+  const location = useLocation();
+  const recievedProps = location.state.propsToPass;
+  const { data, isLoading, isSuccess } = useGetSellerByIdQuery(recievedProps);
+  const userEmail = useSelector((state) => state.global.userEmail);
   const [isDisabled, setIsDisabled] = React.useState(true);
   const [hyperlink, setHyperlink] = React.useState();
+  const navigate = useNavigate();
+
+
+  React.useEffect(() => {
+    if (isSuccess && userEmail === data.seller.user.email) {
+        navigate("/sellerdashboard", { replace: true });
+    }
+  }, [isSuccess]);
 
   React.useEffect(() => {
     if (data && !isLoading) {
       setHyperlink(
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${data.contact_info.location.latitude}&lon=${data.contact_info.location.longitude}`
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=&lon=`
       );
+      // ${data.seller.contact_info.location.latitude}
+      // ${data.seller.contact_info.location.longitude}
       setIsDisabled(false);
     }
   }, [isLoading]);
@@ -55,6 +73,7 @@ function SellerInfo() {
           {data || (!isLoading && isSuccess) ? (
             <Box
               display={"flex"}
+              flex={3}
               flexDirection={"column"}
               alignItems={"center"}
             >
@@ -74,7 +93,7 @@ function SellerInfo() {
               <Rating
                 name="size-large"
                 defaultValue={0}
-                value={4}
+                value={data.seller.rating}
                 size="large"
                 readOnly
                 sx={{
@@ -104,7 +123,7 @@ function SellerInfo() {
             </Box>
           )}
         </Box>
-        <Box>
+        <Box flex={9}>
           <Card
             sx={{
               flex: 1,
@@ -113,7 +132,7 @@ function SellerInfo() {
             }}
           >
             {data || (!isLoading && isSuccess) ? (
-              <Header title={data.display_name} subtitle={data.description} />
+              <SmallHeader title={data.seller.name} />
             ) : (
               <Box
                 sx={{
@@ -145,24 +164,42 @@ function SellerInfo() {
             >
               Description:
             </Typography>
-            <Paper elevation={2}>
-              {data || (!isLoading && isSuccess) ? (
-                <Typography
+            {data || (!isLoading && isSuccess) ? (
+              <Typography>
+                {data.seller.description}
+              </Typography>
+            ) : (
+              <Box>
+                <Skeleton
+                  animation="wave"
                   sx={{
-                    padding: "0.3rem",
-                    my: "0.5rem",
+                    margin: "0.2rem",
                   }}
-                >
-                  {data.description}
-                </Typography>
-              ) : (
-                <Box>
-                  <Skeleton animation="wave" width={300} height={20} />
-                  <Skeleton animation="wave" width={300} height={20} />
-                  <Skeleton animation="wave" width={300} height={20} />
-                </Box>
-              )}
-            </Paper>
+                  height={20}
+                />
+                <Skeleton
+                  animation="wave"
+                  sx={{
+                    margin: "0.2rem",
+                  }}
+                  height={20}
+                />
+                <Skeleton
+                  animation="wave"
+                  sx={{
+                    margin: "0.2rem",
+                  }}
+                  height={20}
+                />
+                <Skeleton
+                  animation="wave"
+                  sx={{
+                    margin: "0.2rem",
+                  }}
+                  height={20}
+                />
+              </Box>
+            )}
             <Box>
               <Typography
                 sx={{
@@ -179,7 +216,7 @@ function SellerInfo() {
                 }}
               >
                 {data || (!isLoading && isSuccess) ? (
-                  data.contact_info.address
+                  data.seller.contact_info.address
                 ) : (
                   <Skeleton width={170} />
                 )}
@@ -197,11 +234,35 @@ function SellerInfo() {
           </Card>
         </Box>
       </Box>
-      <Box
-        justifyContent={"space-evenly"}
-        alignItems={"center"}
-        display={"flex"}
-      >
+      {data || (!isLoading && isSuccess) ? (
+        data.seller.isBoardingService ? (
+          <Box
+            justifyContent={"space-evenly"}
+            alignItems={"center"}
+            display={"flex"}
+          >
+            <Card
+              sx={{
+                flex: 1,
+                marginBottom: "1rem",
+                mx: "1rem",
+                p: "1rem",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "2rem",
+                }}
+              >
+                Boarding Service
+              </Typography>
+              {/* {data.seller.boarding_service} */}
+            </Card>
+          </Box>
+        ) : null
+      ) : null}
+      <Box display={"flex"}>
         <Card
           sx={{
             flex: 1,
@@ -211,38 +272,21 @@ function SellerInfo() {
           }}
         >
           <Typography
-            
+            flex={1}
             sx={{
               fontWeight: "bold",
-              fontSize: "2rem",
+              fontSize: "1.5rem",
             }}
           >
             Cattle On Sale
           </Typography>
-          <CardSkeletonBase repeatingCount={4} />
-        </Card>
-      </Box>
-      <Box
-        justifyContent={"space-evenly"}
-        alignItems={"center"}
-        display={"flex"}
-      >
-        <Card
-          sx={{
-            flex: 1,
-            marginBottom: "1rem",
-            mx: "1rem",
-            p: "1rem",
-          }}
-        >
-          <Typography
-            sx={{
-              fontWeight: "bold",
-              fontSize: "2rem",
-            }}
-          >
-            Boarding Services
-          </Typography>
+          {data || (!isLoading && isSuccess) ? (
+            data.seller.cattle_on_sale? data.seller.cattle_on_sale.map((onSaleCattleId) => (
+              <OnSaleCattleGetter onSaleCattleId={onSaleCattleId} />
+            )): <Typography>No Cattle On Sale</Typography>
+          ) : (
+            <CardSkeletonBase repeatingCount={3} />
+          )}
         </Card>
       </Box>
     </>

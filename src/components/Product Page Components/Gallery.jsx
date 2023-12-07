@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from "react";
 import BackdropGallery from "./BackdropGallery";
+import { Box } from "@mui/material";
 
-import prod1 from "../../assets/Pictures/image-product-1.jpg";
-import prod2 from "../../assets/Pictures/image-product-2.jpg";
-import prod3 from "../../assets/Pictures/image-product-3.jpg";
-import prod4 from "../../assets/Pictures/image-product-4.jpg";
+const Gallery = (images) => {
+  const THUMBS = images.images;
+  const IMAGES = images.images;
 
-import thumb1 from "../../assets/Pictures/image-product-1-thumbnail.jpg";
-import thumb2 from "../../assets/Pictures/image-product-2-thumbnail.jpg";
-import thumb3 from "../../assets/Pictures/image-product-3-thumbnail.jpg";
-import thumb4 from "../../assets/Pictures/image-product-4-thumbnail.jpg";
+  console.log(IMAGES);
 
-const IMAGES = [prod1, prod2, prod3, prod4];
-const THUMBS = [thumb1, thumb2, thumb3, thumb4];
-
-const Gallery = () => {
-  const [currentImage, setCurrentImage] = useState(prod1);
-  const [currentPassedImage, setCurrentPassedImage] = useState(prod1);
+  const [currentImage, setCurrentImage] = useState(IMAGES[0]);
+  const [currentPassedImage, setCurrentPassedImage] = useState(IMAGES[0]);
 
   const [open, setOpen] = useState(false);
   const handleClick = (index) => {
@@ -39,20 +32,22 @@ const Gallery = () => {
   }, [currentImage]);
 
   return (
-    <section className="gallery-holder hide-in-mobile">
-      <section className="gallery">
-        <div className="image">
-          <img src={currentImage} alt="product-1" onClick={handleToggle} />
-        </div>
+    <Box className="gallery-holder hide-in-mobile">
+      <Box className="gallery">
+        <Box className="image">
+          <img width={600} height={380} src={currentImage} alt="Product" onClick={handleToggle} />
+        </Box>
         <BackdropGallery
+          IMAGES={IMAGES}
+          THUMBS={THUMBS}
           handleClose={handleClose}
           open={open}
           currentPassedImage={currentPassedImage}
         />
-        <div className="thumbnails">
+        <Box className="thumbnails">
           {THUMBS.map((th, index) => {
             return (
-              <div
+              <Box
                 className="img-holder"
                 key={index}
                 onClick={(e) => {
@@ -61,14 +56,14 @@ const Gallery = () => {
                   e.currentTarget.childNodes[0].classList.toggle("activated");
                 }}
               >
-                <div className={`outlay ${index === 0 && "activated"}`}></div>
-                <img src={th} alt={`product-${index + 1}`} />
-              </div>
+                <Box className={`outlay ${index === 0 && "activated"}`}></Box>
+                <img width={90} height={40} src={th} alt={`product-${index + 1}`} />
+              </Box>
             );
           })}
-        </div>
-      </section>
-    </section>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

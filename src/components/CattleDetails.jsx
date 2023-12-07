@@ -15,23 +15,25 @@ export default function CattleDetails(props) {
   const [image, setImage] = useState();
   const [base64Files, setBase64Files] = useState([]);
   const [gender, setGender] = useState("");
-  const [age, setAge] = useState("");
+  const [age, setAge] = useState();
   const [breed, setBreed] = useState("");
   const [color, setColor] = useState("");
-  const [weight, setWeight] = useState("");
+  const [weight, setWeight] = useState();
   const [category, setCategory] = useState("");
   const theme = useTheme();
 
-  props.func({
-    "name": name,
-    "age": age,
-    "gender": gender,
-    "weight": weight,
-    "category": category,
-    "breed": breed,
-    "color": color,
-    "base64Files": base64Files,
-  });
+  React.useEffect(() => {
+    props.func({
+      "name": name,
+      "age": age,
+      "gender": gender,
+      "weight": weight,
+      "category": category,
+      "breed": breed,
+      "color": color,
+      "base64Files": base64Files,
+    });
+  }, [name, age, gender, weight, category, breed, color, base64Files]);
 
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",

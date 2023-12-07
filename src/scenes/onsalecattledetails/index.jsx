@@ -1,35 +1,27 @@
 import { useTheme } from "@emotion/react";
-import { Box, Skeleton } from "@mui/material";
+import { Box, Divider, Skeleton } from "@mui/material";
 import Description from "components/Product Page Components/Description";
 import Gallery from "components/Product Page Components/Gallery";
 import MobileGallery from "components/Product Page Components/MobileGallery";
 import React, { useEffect, useState } from "react";
-import profileImage from "assets/profile.jpeg";
 import { useLocation } from "react-router-dom";
 import FAQs from "components/Product Page Components/FAQs";
-import {
-  useGetOnSaleCattleDetailsQuery, useGetOnSaleCattleImagesQuery,
-} from "state/api";
+import { useDispatch, useSelector } from "react-redux";
+import AskQuestions from "components/AskQuestions";
 
 const OnSaleCattleDetails = () => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.global.isLoggedIn);
   const location = useLocation();
   const recievedProps = location.state.propsToPass;
-  const { dataForRecievedProps } = `"${recievedProps}"`;
-  const { data, isLoading, isSuccess } = useGetOnSaleCattleImagesQuery(
-    recievedProps.cattle_info
-  );
-  // })
-  // console.log(recievedProps);
-  // console.log(id);
-  // console.log(data);
 
   return (
     <div>
       <Box>
-        <Box className="core">
-          {data || (!isLoading && isSuccess) ? (
-            <Gallery images={data} />
+        <Box className="core" display={"flex"}>
+          {recievedProps.images && recievedProps.images[0] ? (
+            <Gallery images={recievedProps.images} />
           ) : (
             <Skeleton
               animation="wave"
@@ -38,18 +30,20 @@ const OnSaleCattleDetails = () => {
               height={480}
             />
           )}
-          {data || (!isLoading && isSuccess) ? (
-            <MobileGallery images={data} />
-          ) : <></>}
+          {recievedProps.images && recievedProps.images[0] ? (
+            <MobileGallery images={recievedProps.images} />
+          ) : (
+            <></>
+          )}
           <Description
             key={recievedProps._id}
             _id={recievedProps._id}
             title={recievedProps.title}
-            image={profileImage}
             description={recievedProps.description}
             category={recievedProps.category}
             cattle_info={recievedProps.cattle_info}
             contact={recievedProps.contact}
+            seller={recievedProps.seller_info}
             questions={recievedProps.questions}
             location={recievedProps.location}
             price={recievedProps.price}
@@ -63,7 +57,20 @@ const OnSaleCattleDetails = () => {
             marginBottom: "2rem",
           }}
         >
-          <FAQs questions={recievedProps.questions} />
+          <FAQs
+            questions={recievedProps.questions}
+            seller={recievedProps.seller_info}
+          />
+          <Box>
+            {isLoggedIn ? (
+              <AskQuestions
+                onsalecattle={recievedProps._id}
+                seller={recievedProps.seller_info}
+              />
+            ) : (
+              <></>
+            )}
+          </Box>
         </Box>
       </Box>
     </div>

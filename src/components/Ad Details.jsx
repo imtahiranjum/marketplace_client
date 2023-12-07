@@ -8,11 +8,18 @@ import InputField from "./styled-components/TextField";
 import { Field, Form, FormSpy } from "react-final-form";
 import RFTextField from "form/RFTextField";
 
-export default function AdDetails() {
+export default function AdDetails(props) {
   const [title, setTitle] = React.useState("");
   const [price, setPrice] = React.useState("");
   const [description, setDescription] = React.useState("");
-  
+
+  React.useEffect(() => {
+    props.func({
+      "title": title,
+      "price": price,
+      "description": description,
+    });
+  }, [title, price, description]);
 
 
   return (
@@ -38,6 +45,7 @@ export default function AdDetails() {
               sx={{
                 my: "0.5rem",
               }}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -50,6 +58,7 @@ export default function AdDetails() {
               sx={{
                 my: "0.5rem",
               }}
+              onChange={(e) => setPrice(e.target.value)}
             />
           </Grid>
         </Grid>
@@ -64,6 +73,7 @@ export default function AdDetails() {
           sx={{
             my: "0.5rem",
           }}
+          onChange={(e) => setDescription(e.target.value)}
         />
       </Box>
     </React.Fragment>

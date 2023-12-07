@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Card,
@@ -12,22 +12,33 @@ import {
   CardMedia,
   CardActionArea,
   Skeleton,
+  IconButton,
 } from "@mui/material";
 import {
+  useAddToFavoriteMutation,
   useGetOnSaleCattleImagesQuery,
   useGetOnSaleCattleQuery,
+  useGetUserByEmailQuery,
+  useRemoveFromFavoriteMutation,
 } from "state/api";
-import profileImage from "assets/profile.jpeg";
 import Typography from "components/Typography";
 import { useNavigate } from "react-router-dom";
 import RepeatedCardSkeleton from "components/RepeatedCardSkeleton";
 import CardSkeletonBase from "components/CardSkeltonBase";
+import {
+  Favorite,
+  FavoriteBorder,
+  FavoriteOutlined,
+  FavoriteRounded,
+  FavoriteSharp,
+} from "@mui/icons-material";
+import { useSelector } from "react-redux";
 // import BannerSlide from "components/BannerSlide";
 
-const OnSaleCattle = ({
+export const OnSaleCattle = ({
   _id,
   title,
-  image,
+  images,
   description,
   price,
   category,
@@ -41,7 +52,7 @@ const OnSaleCattle = ({
   const propsToPass = {
     _id,
     title,
-    image,
+    images,
     description,
     price,
     category,
@@ -51,6 +62,11 @@ const OnSaleCattle = ({
     seller_info,
     questions,
   };
+  const userEmail = useSelector((state) => state.global.userEmail);
+  const isLoggedIn = useSelector((state) => state.global.isLoggedIn);
+  const [userId, setUserId] = React.useState("");
+  const { data, isLoading, isSuccess } = useGetUserByEmailQuery(userEmail);
+  console.log(data);
   const navigateToDetailsPage = () => {
     navigate("/onsalecattledetails", {
       replace: false,
@@ -58,11 +74,84 @@ const OnSaleCattle = ({
     });
   };
   const theme = useTheme();
+  const [favorite, setFavorite] = React.useState(false);
+  const [favoriteButtonClick, setFavoriteButtonClick] = React.useState(false);
   const handleClick = () => {
     navigateToDetailsPage();
   };
-  const { data, isLoading, isSuccess } =
-    useGetOnSaleCattleImagesQuery(cattle_info);
+  const [addToFavorite] = useAddToFavoriteMutation();
+  const [removeFromFavorite] = useRemoveFromFavoriteMutation();
+
+  // const handleFavoriteClick = () => {
+  // };
+
+  useEffect(() => {
+    if (isLoggedIn && isSuccess && !isLoading) {
+      data.profile && data.profile.favorites
+        ? data.profile.favorites.map((favorite) => {
+            if (favorite.onSaleCattleId === _id) {
+              setFavorite(true);
+            }
+          })
+        : setFavorite(false);
+    }
+  }, [isLoading, isSuccess]);
+
+  const FavoriteIcon = () => {
+    if (favorite) {
+      return <FavoriteSharp color="#FF0000" />;
+    } else {
+      return <FavoriteBorder />;
+    }
+  };
+
+  const favoriteAdder = async () => {
+    const payload = await addToFavorite({
+      onSaleCattleId: _id,
+      userId: userId,
+    });
+  };
+
+  const favoriteRemover = async () => {
+    const payload = await removeFromFavorite({
+      onSaleCattleId: _id,
+      userId: userId,
+    });
+  };
+
+  const favoriteHandler = () => {
+    console.log("favorite clicked");
+    if (favorite) {
+      console.log("add");
+      favoriteAdder();
+      setFavorite(true);
+    } else {
+      if (data.profile && data.profile.favorites !== undefined) {
+        data.profile.favorites.map((favor) => {
+          if (favor.onSaleCattleId === _id) {
+            console.log("remove");
+            favoriteRemover();
+            setFavorite(false);
+          }
+        });
+      }
+    }
+    setFavorite(!favorite);
+  };
+
+  useEffect(() => {
+    if (isSuccess && !isLoading) {
+      setUserId(data.id);
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (favoriteButtonClick) {
+      favoriteHandler();
+      setFavoriteButtonClick(false);
+    }
+  }, [favoriteButtonClick]);
+
   return (
     <Card
       sx={{
@@ -71,7 +160,7 @@ const OnSaleCattle = ({
         borderRadius: "0.55rem",
         borderColor: "darkgrey",
         width: 320,
-        height: 400,
+        maxHeight: 500,
       }}
     >
       <CardActions>
@@ -88,8 +177,8 @@ const OnSaleCattle = ({
               },
             }}
             image={
-              data && isSuccess ? (
-                data[0]
+              images && images[0] ? (
+                images[0]
               ) : (
                 <Skeleton
                   animation="wave"
@@ -121,6 +210,13 @@ const OnSaleCattle = ({
 
         <Typography variant="body2">{description}</Typography>
       </CardContent>
+      {isLoggedIn ? (
+        <IconButton onClick={() => setFavoriteButtonClick(true)}>
+          <FavoriteIcon />
+        </IconButton>
+      ) : (
+        <></>
+      )}
     </Card>
   );
 };
@@ -144,7 +240,7 @@ const AllOnSaleCattle = () => {
         mt="23px"
         color={theme.palette.primary}
         display="grid"
-        position={"static"}
+        // position={"static"}
         gridTemplateColumns={
           isExtraLarge
             ? "repeat(5, minmax(0, 1fr))"
@@ -159,15 +255,15 @@ const AllOnSaleCattle = () => {
         justifyContent="space-between"
         rowGap="25px"
         columnGap="1.0%"
-        justifyItems={"center"}
-        alignItems={"baseline"}
+        // justifyItems={"center"}
+        // alignItems={"baseline"}
       >
         {data || (isSuccess && !isLoading) ? (
           data.map(
             ({
               _id,
               title,
-              image,
+              images,
               description,
               location,
               contact,
@@ -181,7 +277,7 @@ const AllOnSaleCattle = () => {
                 key={_id}
                 _id={_id}
                 title={title}
-                image={profileImage}
+                images={images}
                 description={description}
                 category={category}
                 cattle_info={cattle_info}

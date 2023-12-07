@@ -13,13 +13,13 @@ function CardSkeletonBase({ repeatingCount }) {
 
   return (
     <Box
-      m="1.5rem 2.5rem"
-      backgroundColor={theme.palette.secondary}
-      mt="23px"
-      color={theme.palette.primary}
+      // m={"auto"}
+      // backgroundColor={theme.palette.secondary}
+      // mt="23px"
+      // color={theme.palette.primary}
       display="grid"
-      justifyContent={"space-evenly"}
-      position={"static"}
+      justifyContent={"space-between"}
+      // // position={"static"}
       gridTemplateColumns={
         isExtraLarge
           ? "repeat(5, minmax(0, 1fr))"
@@ -31,10 +31,10 @@ function CardSkeletonBase({ repeatingCount }) {
           ? "repeat(2, minmax(0, 1fr))"
           : "repeat(1, minmax(0, 1fr))"
       }
-      rowGap="25px"
-      columnGap="1.0%"
-      justifyItems={"center"}
-      alignItems={"baseline"}
+      // rowGap="25px"
+      // columnGap="1.0%"
+      // justifyItems={"center"}
+      // alignItems={"baseline"}
     >
       <RepeatedCardSkeleton repeatingCount={repeatingCount}/>
     </Box>

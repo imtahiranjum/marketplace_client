@@ -10,9 +10,9 @@ import AppFooter from 'components/AppFooter';
 const Layout = () => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const userId = useSelector((state)=> state.global.userId);
-  const { data } = useGetUserQuery(userId);
-  console.log("🚀 ~ file: index.jsx:19 ~ Layout ~ data:", data)
+  // const userId = useSelector((state)=> state.global.userId);
+  // const user = useGetUserQuery(userId);
+  // console.log("🚀 ~ file: index.jsx:19 ~ Layout ~ data:", user)
   
   return (
     <div>

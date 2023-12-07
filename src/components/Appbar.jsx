@@ -18,7 +18,7 @@ import { styled, alpha } from "@mui/material/styles";
 import { useGetUserByEmailQuery, useLogoutUserMutation } from "state/api";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setUserEmail, setUserId } from "state";
+import { setIsLoggedIn, setUserEmail, setUserId } from "state";
 
 const pages = ["Cattle List"];
 const settings = ["Profile", "Logout"];
@@ -46,6 +46,7 @@ function ResponsiveAppBar() {
   const [isSignedIn, setIsSignedIn] = React.useState(userEmail ? true : false);
   const [isSeller, setIsSeller] = React.useState(false);
   const [isBuyer, setIsBuyer] = React.useState(false);
+  const [isLoggedOut, setIsLoggedOut] = React.useState(false);
 
   React.useEffect(() => {
     if (data === undefined) {
@@ -69,44 +70,60 @@ function ResponsiveAppBar() {
   }, [isSuccess]);
 
   React.useEffect(() => {
-    if (data && !isLoading) {
-      (!isSignedIn || !isSeller)
-        ? setSwitchButtonAction(
-            <Button
-              component="label"
-              variant="contained"
-              onClick={handleSwitch}
-              sx={{
-                borderRadius: 3,
-                color: "white",
-              }}
-              color="secondary"
-              disabled={false}
-              size="medium"
-            >
-              Become Seller!
-            </Button>
-          )
-        : isSeller
-        ? setSwitchButtonAction(
-            <Button
-              component="label"
-              variant="contained"
-              onClick={handleSwitchDashboard}
-              sx={{
-                borderRadius: 3,
-                color: "white",
-              }}
-              color="secondary"
-              disabled={false}
-              size="medium"
-            >
-              Your Dashboard
-            </Button>
-          )
-        : setSwitchButtonAction("");
+    if ((data && !isLoading) || !isSignedIn) {
+      isSignedIn
+        ? !isSeller
+          ? setSwitchButtonAction(
+              <Button
+                component="label"
+                variant="contained"
+                onClick={handleSwitch}
+                sx={{
+                  borderRadius: 3,
+                  color: "white",
+                }}
+                color="secondary"
+                disabled={false}
+                size="medium"
+              >
+                Become Seller
+              </Button>
+            )
+          : setSwitchButtonAction(
+              <Button
+                component="label"
+                variant="contained"
+                onClick={handleSwitchDashboard}
+                sx={{
+                  borderRadius: 3,
+                  color: "white",
+                }}
+                color="secondary"
+                disabled={false}
+                size="medium"
+              >
+                Your Dashboard
+              </Button>
+            )
+        : setSwitchButtonAction(
+          
+          <Button
+          component="label"
+          variant="contained"
+          onClick={handleSwitch}
+          sx={{
+            borderRadius: 3,
+            color: "white",
+          }}
+          color="secondary"
+          disabled={false}
+          size="medium"
+        >
+          Become Seller!
+        </Button>
+        );
     }
-  }, [isSeller, isSuccess, isSignedIn]);
+  }, [isSeller, isSuccess, isSignedIn, isLoggedOut]);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -165,6 +182,7 @@ function ResponsiveAppBar() {
     const payload = await logoutUser();
     dispatch(setUserEmail(""));
     dispatch(setUserId(""));
+    dispatch(setIsLoggedIn(false));
   };
 
   React.useEffect(() => {
@@ -179,6 +197,7 @@ function ResponsiveAppBar() {
   React.useEffect(() => {
     if (action == "Logout") {
       logoutAction();
+      setIsLoggedOut(true);
       setIsSignedIn(false);
       if (!result.error) {
         setAlertOpen(true);
@@ -373,13 +392,12 @@ function ResponsiveAppBar() {
               >
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Tooltip title="Open settings">
-                    {data && !isLoading ? (
-                      (data.profile.profile_image !== undefined) ? ( 
+                    {data && !isLoading && isSuccess ? (
+                      data.profile && data.profile.profile_image ? (
                         <Avatar alt="" src={data.profile.profile_image} />
-                      ):(
+                      ) : (
                         <Avatar alt="" src={data.name} />
                       )
-                      
                     ) : (
                       <Skeleton
                         variant="circular"

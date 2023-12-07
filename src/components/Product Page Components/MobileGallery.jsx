@@ -1,18 +1,15 @@
-import { IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import React, { useState } from "react";
 
-import prod1 from "../../assets/Pictures/image-product-1.jpg";
-import prod2 from "../../assets/Pictures/image-product-2.jpg";
-import prod3 from "../../assets/Pictures/image-product-3.jpg";
-import prod4 from "../../assets/Pictures/image-product-4.jpg";
 import NextIcon from "./Icons/NextIcon";
 import PreviousIcon from "./Icons/PreviousIcon";
 
-const IMAGES = [prod1, prod2, prod3, prod4];
+const MobileGallery = (images) => {
+  const IMAGES = images.images;
+  console.log(IMAGES)
 
-const MobileGallery = () => {
-  const [currentMobileImage, setCurrentMobileImage] = useState(prod1);
-  const [mobileImageIndex, setMobileImageIndex] = useState(1);
+  const [currentMobileImage, setCurrentMobileImage] = useState(IMAGES[0]);
+  const [mobileImageIndex, setMobileImageIndex] = useState(0);
 
   const handleIncrement = () => {
     if (mobileImageIndex === IMAGES.length - 1) {
@@ -35,7 +32,7 @@ const MobileGallery = () => {
   };
 
   return (
-    <section className="mobile-gallery hide-in-desktop">
+    <Box className="mobile-gallery hide-in-desktop">
       <IconButton
         className="icon-button-prev"
         disableRipple
@@ -61,7 +58,7 @@ const MobileGallery = () => {
       >
         <NextIcon />
       </IconButton>
-    </section>
+    </Box>
   );
 };
 
