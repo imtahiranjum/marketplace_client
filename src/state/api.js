@@ -16,8 +16,22 @@ export const api = createApi({
     "Answer",
     "Cattle",
     "AllCattle",
+    "Image",
+    "Coversation"
   ],
   endpoints: (build) => ({
+    getMessages: build.query({
+      query: (conversationId) => `messages/${conversationId}`,
+      providesTags: ["User", "Coversation"],
+    }),
+    getConversations: build.query({
+      query: (id) => `conversations/${id}`,
+      providesTags: ["User", "Coversation"],
+    }),
+    getMutualConversations: build.query({
+      query: (id) => `conversations/find/${id}/${id}`,
+      providesTags: ["User", "Coversation"],
+    }),
     getUser: build.query({
       query: (id) => `user/id/${id}`,
       providesTags: ["User"],
@@ -201,6 +215,52 @@ export const api = createApi({
       }),
       invalidatesTags: ["OnSaleCattle"],
     }),
+    changeProfileImage: build.mutation({
+      query: (userId, image) => ({
+        url: "user/changeprofileimage",
+        method: "POST",
+        body: userId,
+        image,
+      }),
+      invalidatesTags: ["Image", "User"],
+    }),
+    changeProfileBio: build.mutation({
+      query: (userId, bio) => ({
+        url: "user/changeprofilebio",
+        method: "POST",
+        body: userId,
+        bio,
+      }),
+      invalidatesTags: ["User"],
+    }),
+    changeSellerDescription: build.mutation({
+      query: (sellerId, description) => ({
+        url: "user/changesellerdescription",
+        method: "POST",
+        body: sellerId,
+        description,
+      }),
+      invalidatesTags: ["User", "Seller"],
+    }),
+    addNewConversation: build.mutation({
+      query: (userId, sellerId) => ({
+        url: "conversations/addnewconversation",
+        method: "POST",
+        body: userId,
+        sellerId,
+      }),
+      invalidatesTags: ["User", "Coversation"],
+    }),
+    addNewMessage: build.mutation({
+      query: (coversationId, userId, text) => ({
+        url: "conversations/addnewconversation",
+        method: "POST",
+        body: coversationId,
+        userId,
+        text,
+      }),
+      invalidatesTags: ["User", "Coversation"],
+    }),
   }),
 });
 
@@ -226,4 +286,12 @@ export const {
   useAddAnswerMutation,
   useAddToFavoriteMutation,
   useRemoveFromFavoriteMutation,
+  useChangeProfileImageMutation,
+  useChangeProfileBioMutation,
+  useGetConversationsQuery,
+  useGetMutualConversationsQuery,
+  useAddNewConversationMutation,
+  useGetMessagesQuery,
+  useAddNewMessageMutation,
+  useChangeSellerDescriptionMutation,
 } = api;
