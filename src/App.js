@@ -39,7 +39,7 @@ function App() {
               <Route path="/sellerdashboard" element={<SellerDashboard />} />
               <Route path="/userprofile" element={<UserProfile />} />
               <Route path="/addcattletosale" element={<AddNewCattleToSale />} />
-              <Route path="/chat" element={<Chat/>} />
+              <Route path="/chat" element={<Chat />} />
             </Route>
             <Route path="/registerseller" element={<RegisterSeller />} />
             <Route path="/signin" element={<SignIn />} />
