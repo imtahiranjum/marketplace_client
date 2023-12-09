@@ -19,6 +19,7 @@ import { useGetUserByEmailQuery, useLogoutUserMutation } from "state/api";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsLoggedIn, setUserEmail, setUserId } from "state";
+import { wait } from "@testing-library/user-event/dist/utils";
 
 const pages = ["Cattle List"];
 const settings = ["Profile", "Logout"];
@@ -106,22 +107,21 @@ function ResponsiveAppBar() {
               </Button>
             )
         : setSwitchButtonAction(
-          
-          <Button
-          component="label"
-          variant="contained"
-          onClick={handleSwitch}
-          sx={{
-            borderRadius: 3,
-            color: "white",
-          }}
-          color="secondary"
-          disabled={false}
-          size="medium"
-        >
-          Become Seller!
-        </Button>
-        );
+            <Button
+              component="label"
+              variant="contained"
+              onClick={handleSwitch}
+              sx={{
+                borderRadius: 3,
+                color: "white",
+              }}
+              color="secondary"
+              disabled={false}
+              size="medium"
+            >
+              Become Seller!
+            </Button>
+          );
     }
   }, [isSeller, isSuccess, isSignedIn, isLoggedOut]);
 
@@ -166,6 +166,34 @@ function ResponsiveAppBar() {
         state: { context: "becomeseller", from: "onsalecattle" },
       });
     }
+  };
+
+  const TooltipGetter = () => {
+
+    
+
+    return (
+      <Tooltip title="Open settings">
+        {data && !isLoading && isSuccess ? (
+          data.profile && data.profile.profile_image ? (
+            <Avatar alt="" src={data.profile.profile_image} />
+          ) : (
+            <Avatar alt="" src={data.name} />
+          )
+        ) : (
+          <Skeleton
+            variant="circular"
+            width={30}
+            height={30}
+            sx={{
+              marginRight: "0.5rem",
+              marginLeft: "0.5rem",
+              color: "white",
+            }}
+          />
+        )}
+      </Tooltip>
+    );
   };
 
   const handleAlertClose = (event, reason) => {
@@ -391,26 +419,7 @@ function ResponsiveAppBar() {
                 }}
               >
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Tooltip title="Open settings">
-                    {data && !isLoading && isSuccess ? (
-                      data.profile && data.profile.profile_image ? (
-                        <Avatar alt="" src={data.profile.profile_image} />
-                      ) : (
-                        <Avatar alt="" src={data.name} />
-                      )
-                    ) : (
-                      <Skeleton
-                        variant="circular"
-                        width={30}
-                        height={30}
-                        sx={{
-                          marginRight: "0.5rem",
-                          marginLeft: "0.5rem",
-                          color: "white",
-                        }}
-                      />
-                    )}
-                  </Tooltip>
+                  {<TooltipGetter />}
                   <Typography
                     sx={{
                       marginRight: "0.5rem",
