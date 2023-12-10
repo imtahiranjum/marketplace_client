@@ -8,34 +8,43 @@ import { io } from "socket.io-client";
 import ResponsiveAppBar from "components/Appbar";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  useGetMessagesQuery,
   useGetUserByEmailQuery,
   useGetUserIdQuery,
   useGetUserQuery,
 } from "state/api";
 import { useLocation } from "react-router-dom";
+import { waitFor } from "@testing-library/react";
+import { Fab, Grid, TextField } from "@mui/material";
+import { Send } from "@mui/icons-material";
 
 export default function Chat() {
-  const dispatch = useDispatch();
   const location = useLocation();
-  const sellerId = location.state.seller;
+  const sellerId = location.state ? location.state.seller.id : null;
   const userEmail = useSelector((state) => state.global.userEmail);
-  const user = useGetUserByEmailQuery(userEmail);
+  const { data, isLoading, isSuccess } = useGetUserByEmailQuery(userEmail);
   const [conversations, setConversations] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
-  const [onlineUsers, setOnlineUsers] = useState([]);
   const [userId, setUserId] = useState("");
-  // const [sellerId, setSellerId] = useState("");
+  const [currentChatClicked, setCurrentChatClicked] = useState(false);
+  const messagesQuerey = useGetMessagesQuery(
+    currentChat ? currentChat._id : null
+  );
   const socket = useRef();
   const scrollRef = useRef();
 
   useEffect(() => {
-    if (user.isSuccess && !user.isLoading) {
-      setUserId(user.data.id);
+    if (isSuccess && !isLoading) setUserId(data.id);
+  }, [data]);
+
+  useEffect(() => {
+    if (isSuccess && !isLoading) {
+      setUserId(data.id);
     }
-  }, [user.isSuccess]);
+  }, [isSuccess]);
 
   useEffect(() => {
     socket.current = io("ws://localhost:8900");
@@ -52,12 +61,30 @@ export default function Chat() {
     arrivalMessage && currentChat
       ? currentChat.members.includes(arrivalMessage.sender)
       : null && setMessages((prev) => [...prev, arrivalMessage]);
-  }, [arrivalMessage, currentChat]);
+  }, [arrivalMessage, currentChat, messages]);
 
   useEffect(() => {
+    if (currentChatClicked) {
+      if (messagesQuerey.isSuccess) {
+        setMessages(messagesQuerey.data);
+      }
+    }
+  }, [currentChatClicked]);
+
+  // const waitFunction = async () => {
+  //   if (userId === "") {
+  //     console.log("waiting for user id");
+  //     const x = await waitFor(userId !== "");
+  //   }
+  // }
+
+  useEffect(() => {
+    // waitFunction()
     const getConversations = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/conversations/" + userId);
+        const res = await axios.get(
+          "http://localhost:5001/conversations/" + userId
+        );
         setConversations(res.data);
       } catch (err) {
         console.log(err);
@@ -70,7 +97,9 @@ export default function Chat() {
     const getMessages = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5001/messages/" + currentChat ? currentChat._id : null
+          "http://localhost:5001/messages/" + currentChat
+            ? currentChat._id
+            : null
         );
         setMessages(res.data);
       } catch (err) {
@@ -97,7 +126,10 @@ export default function Chat() {
     });
 
     try {
-      const res = await axios.post("http://localhost:5001/messages", message);
+      const res = await axios.post(
+        "http://localhost:5001/messages/addnewmessage",
+        message
+      );
       setMessages([...messages, res.data]);
       setNewMessage("");
     } catch (err) {
@@ -113,25 +145,28 @@ export default function Chat() {
 
   const findConversationElseCreateNew = async () => {
     try {
-      const res = await axios.get(`http://localhost:5001/conversations/find/${userId}/${sellerId}`);
+      const res = await axios.get(
+        `http://localhost:5001/conversations/find/${userId}/${sellerId}`
+      );
       setCurrentChat(res.data);
+      if (currentChat === null) {
+        const newConversation = {
+          userId,
+          sellerId,
+        };
+        const res = await axios.post(
+          "http://localhost:5001/conversations/addnewconversation",
+          newConversation
+        );
+        setCurrentChat(res.data);
+      }
+      socket.current.emit("addUser", userId);
     } catch (err) {
       console.log(err);
-    }
-    if (currentChat === null) {
-      const newConversation = {
-        sender: userId,
-        receiver: sellerId,
-      };
-      const res = await axios.post("http://localhost:5001/conversations", newConversation);
-      setCurrentChat(res.data);
     }
   };
 
   useEffect(() => {
-    while (userId === null) {
-      console.log("waiting for user id");
-    }
     if (conversations.length === 0) {
       findConversationElseCreateNew();
     }
@@ -143,9 +178,17 @@ export default function Chat() {
       <div className="messenger">
         <div className="chatMenu">
           <div className="chatMenuWrapper">
-            <input placeholder="Search Conversation" className="chatMenuInput" />
+            <input
+              placeholder="Search Conversation"
+              className="chatMenuInput"
+            />
             {conversations.map((c) => (
-              <div onClick={() => setCurrentChat(c)}>
+              <div
+                onClick={() => {
+                  setCurrentChat(c);
+                  setCurrentChatClicked(true);
+                }}
+              >
                 <Conversation conversation={c} currentUser={userId} />
               </div>
             ))}
@@ -163,15 +206,32 @@ export default function Chat() {
                   ))}
                 </div>
                 <div className="chatBoxBottom">
-                  <textarea
-                    className="chatMessageInput"
-                    placeholder="write something..."
+                  {/* <Grid item xs={11}> */}
+                  <TextField
+                    id="outlined-basic-email"
+                    label="Type Something"
+                    fullWidth
                     onChange={(e) => setNewMessage(e.target.value)}
                     value={newMessage}
-                  ></textarea>
-                  <button className="chatSubmitButton" onClick={handleSubmit}>
-                    Send
-                  </button>
+                  />
+                  {/* </Grid> */}
+                  {/* <textarea
+                    className="chatMessageInput"
+                    placeholder="write something..."
+                  ></textarea> */}
+                  {/* <button */}
+                  <Grid xs={1} align="right">
+                    <Fab
+                      color="primary"
+                      aria-label="add"
+                      className="chatSubmitButton"
+                      onClick={handleSubmit}
+                    >
+                      <Send />
+                    </Fab>
+                  </Grid>
+                  {/* Send */}
+                  {/* </button> */}
                 </div>
               </>
             ) : (
