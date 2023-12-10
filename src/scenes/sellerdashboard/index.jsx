@@ -3,6 +3,7 @@ import { email, required } from "form/validation";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  useChangeSellerDescriptionMutation,
   useGetOnSaleCattleDetailsQuery,
   useGetOnSaleCattleQuery,
   useGetSellerByEmailQuery,
@@ -20,6 +21,12 @@ import {
   Skeleton,
   Button,
   useMediaQuery,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  TextField,
+  DialogActions,
 } from "@mui/material";
 import Typography from "components/Typography";
 import Header from "components/Header";
@@ -57,9 +64,12 @@ function SellerDashboard() {
   const [editButton, setEditButton] = React.useState(false);
   const [addCattleToSaleButton, setAddCattleToSaleButton] =
     React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [sellerDescription, setSellerDescription] = React.useState("");
   const navigate = useNavigate();
   const userEmail = useSelector((state) => state.global.userEmail);
   const { data, isLoading, isSuccess } = useGetSellerByEmailQuery(userEmail);
+  const [changeSellerDescription] = useChangeSellerDescriptionMutation();
   const isExtraLarge = useMediaQuery("(min-width: 1920px)");
   const isLarge = useMediaQuery("(min-width: 1620px)");
   const isNonMobile = useMediaQuery("(min-width: 1070px)");
@@ -72,6 +82,56 @@ function SellerDashboard() {
     }
 
     setAlertOpen(false);
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleCloseFinished = async () => {
+    const payload = await changeSellerDescription({
+      sellerId: data.seller._id,
+      description: sellerDescription,
+    });
+    setOpen(false);
+  };
+
+  const FormDialog = () => {
+    return (
+      <React.Fragment>
+        <Box width={"500px"}>
+          <Dialog open={open} onClose={handleClose} fullWidth>
+            <DialogTitle>Bio</DialogTitle>
+            <DialogContent>
+              <DialogContentText>Chnage Description</DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="text"
+                label="Description"
+                type="text"
+                value={sellerDescription}
+                multiline
+                rows={2}
+                fullWidth
+                variant="standard"
+                onChange={(e) => {
+                  setSellerDescription(e.target.value);
+                }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleCloseFinished}>Finish</Button>
+            </DialogActions>
+          </Dialog>
+        </Box>
+      </React.Fragment>
+    );
   };
 
   // React.useEffect(() => {
@@ -104,6 +164,7 @@ function SellerDashboard() {
 
   return (
     <React.Fragment>
+      <FormDialog />
       <Box display={"flex"} justifyContent={"left"} alignItems={"center"}>
         <Box>
           {data || (!isLoading && isSuccess) ? (
@@ -197,7 +258,7 @@ function SellerDashboard() {
                 variant="contained"
                 startIcon={<Edit />}
                 onClick={() => {
-                  // setEditButton(true);
+                  handleClickOpen(true);
                 }}
                 sx={{
                   px: "1.1rem",
@@ -205,7 +266,6 @@ function SellerDashboard() {
               >
                 Edit Info
               </Button>
-
               <Button
                 variant="contained"
                 startIcon={<Add />}
