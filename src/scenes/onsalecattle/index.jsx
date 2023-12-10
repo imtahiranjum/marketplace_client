@@ -62,6 +62,7 @@ export const OnSaleCattle = ({
     seller_info,
     questions,
   };
+  const [favorite, setFavorite] = React.useState(false);
   const userEmail = useSelector((state) => state.global.userEmail);
   const isLoggedIn = useSelector((state) => state.global.isLoggedIn);
   const [userId, setUserId] = React.useState("");
@@ -74,7 +75,6 @@ export const OnSaleCattle = ({
     });
   };
   const theme = useTheme();
-  const [favorite, setFavorite] = React.useState(false);
   const [favoriteButtonClick, setFavoriteButtonClick] = React.useState(false);
   const handleClick = () => {
     navigateToDetailsPage();
@@ -86,24 +86,17 @@ export const OnSaleCattle = ({
   // };
 
   useEffect(() => {
-    if (isLoggedIn && isSuccess && !isLoading) {
+    if (isLoggedIn && isSuccess) {
       data.profile && data.profile.favorites
         ? data.profile.favorites.map((favorite) => {
-            if (favorite.onSaleCattleId === _id) {
+            if (favorite === _id) {
+              console.log("favorite found");
               setFavorite(true);
             }
           })
         : setFavorite(false);
     }
-  }, [isLoading, isSuccess]);
-
-  const FavoriteIcon = () => {
-    if (favorite) {
-      return <FavoriteSharp color="#FF0000" />;
-    } else {
-      return <FavoriteBorder />;
-    }
-  };
+  }, [isSuccess]);
 
   const favoriteAdder = async () => {
     const payload = await addToFavorite({
@@ -120,15 +113,14 @@ export const OnSaleCattle = ({
   };
 
   const favoriteHandler = () => {
-    console.log("favorite clicked");
-    if (favorite) {
+    if (!favorite) {
       console.log("add");
       favoriteAdder();
       setFavorite(true);
-    } else {
-      if (data.profile && data.profile.favorites !== undefined) {
+    } else if (favorite){
+      if (data.profile && data.profile.favorites) {
         data.profile.favorites.map((favor) => {
-          if (favor.onSaleCattleId === _id) {
+          if (favor === _id) {
             console.log("remove");
             favoriteRemover();
             setFavorite(false);
@@ -212,7 +204,15 @@ export const OnSaleCattle = ({
       </CardContent>
       {isLoggedIn ? (
         <IconButton onClick={() => setFavoriteButtonClick(true)}>
-          <FavoriteIcon />
+          {data ? (
+            favorite ? (
+              <FavoriteSharp color="secondary" />
+            ) : (
+              <FavoriteBorder />
+            )
+          ) : (
+            <></>
+          )}
         </IconButton>
       ) : (
         <></>
@@ -290,7 +290,7 @@ const AllOnSaleCattle = () => {
             )
           )
         ) : (
-          <CardSkeletonBase repeatingCount={6} />
+          <CardSkeletonBase repeatingCount={3} />
         )}
       </Box>
     </Box>
