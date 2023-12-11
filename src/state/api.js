@@ -16,21 +16,22 @@ export const api = createApi({
     "Answer",
     "Cattle",
     "AllCattle",
-    "Image",
-    "Coversation"
+    "Images",
+    "Coversation",
+    "Chat"
   ],
   endpoints: (build) => ({
     getMessages: build.query({
       query: (conversationId) => `messages/${conversationId}`,
-      providesTags: ["User", "Coversation"],
+      providesTags: ["User", "Coversation", "Chat"],
     }),
     getConversations: build.query({
       query: (id) => `conversations/${id}`,
-      providesTags: ["User", "Coversation"],
+      providesTags: ["User", "Coversation", "Chat"],
     }),
     getMutualConversations: build.query({
       query: (id) => `conversations/find/${id}/${id}`,
-      providesTags: ["User", "Coversation"],
+      providesTags: ["User", "Coversation", "Chat"],
     }),
     getUser: build.query({
       query: (id) => `user/id/${id}`,
@@ -42,7 +43,7 @@ export const api = createApi({
     }),
     getOnSaleCattleImages: build.query({
       query: (id) => `onsalecattle/getonsalecattleimages/${id}`,
-      providesTags: ["OnSaleCattle"],
+      providesTags: ["OnSaleCattle", "AllCattle", "Images"],
     }),
     getOnSaleCattleDetails: build.query({
       query: (id) => `onsalecattle/getonsalecattledetails/${id}`,
@@ -50,7 +51,7 @@ export const api = createApi({
     }),
     getSellerByEmail: build.query({
       query: (email) => `user/seller/email/${email}`,
-      providesTags: ["Seller"],
+      providesTags: ["Seller", "User"],
     }),
     getUserByEmail: build.query({
       query: (userEmail) => `user/email/${userEmail}`,
@@ -62,16 +63,16 @@ export const api = createApi({
     }),
     getOnSaleCattle: build.query({
       query: () => `onsalecattle/`,
-      providesTags: ["OnSaleCattle"],
+      providesTags: ["OnSaleCattle", "AllCattle"],
     }),
 
     getSpecificOnSaleCattle: build.query({
       query: (id) => `onsalecattle/specificonsalecattle/${id}`,
-      providesTags: ["SpecificOnSaleCattle"],
+      providesTags: ["SpecificOnSaleCattle", "OnSaleCattle"],
     }),
     getAnswer: build.query({
       query: (questionId) => `general/answer/${questionId}`,
-      providesTags: ["User"],
+      providesTags: ["User", "Question", "Answer"],
     }),
     getOneCattle: build.query({
       query: (id) => `cattle/id/${id}`,
@@ -107,7 +108,7 @@ export const api = createApi({
         contact_info,
         userEmail,
       }),
-      invalidatesTags: ["Seller"],
+      invalidatesTags: ["Seller", "User"],
     }),
     loginUser: build.mutation({
       query: (newEmail, password) => ({
@@ -165,17 +166,7 @@ export const api = createApi({
         description,
         user,
       }),
-      invalidatesTags: ["Question", "OnSaleCattle"],
-    }),
-    addQuestion: build.mutation({
-      query: (onsalecattle, description, user) => ({
-        url: "general/addquestion",
-        method: "POST",
-        body: onsalecattle,
-        description,
-        user,
-      }),
-      invalidatesTags: ["Question", "OnSaleCattle"],
+      invalidatesTags: ["Question", "OnSaleCattle", "Answer"],
     }),
     addAnswer: build.mutation({
       query: (answer, questionId) => ({
@@ -184,7 +175,7 @@ export const api = createApi({
         body: answer,
         questionId,
       }),
-      invalidatesTags: ["Question", "OnSaleCattle"],
+      invalidatesTags: ["Question", "OnSaleCattle", "Answer"],
     }),
     addToFavorite: build.mutation({
       query: (onSaleCattleId, userId) => ({
@@ -193,7 +184,7 @@ export const api = createApi({
         body: onSaleCattleId,
         userId,
       }),
-      invalidatesTags: ["Question", "OnSaleCattle"],
+      invalidatesTags: ["OnSaleCattle", "Favorite"],
     }),
     removeFromFavorite: build.mutation({
       query: (onSaleCattleId, userId) => ({
@@ -202,7 +193,7 @@ export const api = createApi({
         body: onSaleCattleId,
         userId,
       }),
-      invalidatesTags: ["Question", "OnSaleCattle"],
+      invalidatesTags: ["OnSaleCattle"],
     }),
     addOneCattleToSale: build.mutation({
       query: (title, description, price, cattle_id) => ({
