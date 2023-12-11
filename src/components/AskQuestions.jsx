@@ -19,11 +19,9 @@ import {
 
 const AskQuestions = ({ onsalecattle, seller }) => {
   const userEmail = useSelector((state) => state.global.userEmail);
-  const isLoggedIn = useSelector((state) => state.global.isLoggedIn);
   const user = useGetUserByEmailQuery(userEmail);
-  const {data, isLoading, isSuccess} = useGetSellerByIdQuery(seller);
+  const { data, isLoading, isSuccess } = useGetSellerByIdQuery(seller);
   const [addQuestion] = useAddQuestionMutation();
-  const [toQuestion, setToQuestion] = React.useState(false);
   const [sellerEmail, setSellerEmail] = React.useState("");
   const [description, setDescription] = React.useState("");
   const theme = useTheme();
@@ -39,9 +37,9 @@ const AskQuestions = ({ onsalecattle, seller }) => {
   useEffect(() => {
     if (data && !user.isLoading && user.isSuccess) {
       console.log(user.data.email, sellerEmail);
-        if (user.data.email !== sellerEmail) {
-          setToQuestion(true);
-        }
+      if (user.data.email !== sellerEmail) {
+        setToQuestion(true);
+      }
     }
   }, [sellerEmail]);
 
@@ -54,7 +52,7 @@ const AskQuestions = ({ onsalecattle, seller }) => {
     setDescription("");
   };
 
-  return isLoggedIn && toQuestion ? (
+  return (
     <Card
       sx={{
         flex: 1,
@@ -100,8 +98,6 @@ const AskQuestions = ({ onsalecattle, seller }) => {
         Submit
       </Button>
     </Card>
-  ) : (
-    <></>
   );
 };
 
