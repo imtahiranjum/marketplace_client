@@ -6,6 +6,7 @@ export const api = createApi({
   tagTypes: [
     "User",
     "OnSaleCattle",
+    "OnSaleCattleDetails",
     "Staff",
     "Employee",
     "AddProduct",
@@ -21,6 +22,10 @@ export const api = createApi({
     "Chat"
   ],
   endpoints: (build) => ({
+    getQuestions: build.query({
+      query: (onSaleCattleId) => `onsalecattle/getquestions/${onSaleCattleId}`,
+      providesTags: ["Question", "OnSaleCattle", "Answer", "OnSaleCattleDetails"],
+    }),
     getMessages: build.query({
       query: (conversationId) => `messages/${conversationId}`,
       providesTags: ["User", "Coversation", "Chat"],
@@ -43,11 +48,11 @@ export const api = createApi({
     }),
     getOnSaleCattleImages: build.query({
       query: (id) => `onsalecattle/getonsalecattleimages/${id}`,
-      providesTags: ["OnSaleCattle", "AllCattle", "Images"],
+      providesTags: ["OnSaleCattle", "AllCattle", "Images", "OnSaleCattleDetails"],
     }),
     getOnSaleCattleDetails: build.query({
       query: (id) => `onsalecattle/getonsalecattledetails/${id}`,
-      providesTags: ["OnSaleCattle"],
+      providesTags: ["OnSaleCattleDetails"],
     }),
     getSellerByEmail: build.query({
       query: (email) => `user/seller/email/${email}`,
@@ -117,7 +122,7 @@ export const api = createApi({
         body: newEmail,
         password,
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: ["User", "OnSaleCattleDetails"],
     }),
     logoutUser: build.mutation({
       query: () => ({
@@ -166,7 +171,7 @@ export const api = createApi({
         description,
         user,
       }),
-      invalidatesTags: ["Question", "OnSaleCattle", "Answer"],
+      invalidatesTags: ["Question", "OnSaleCattle", "Answer", "OnSaleCattleDetails"],
     }),
     addAnswer: build.mutation({
       query: (answer, questionId) => ({
@@ -175,7 +180,7 @@ export const api = createApi({
         body: answer,
         questionId,
       }),
-      invalidatesTags: ["Question", "OnSaleCattle", "Answer"],
+      invalidatesTags: ["Question", "OnSaleCattle", "Answer", "OnSaleCattleDetails"],
     }),
     addToFavorite: build.mutation({
       query: (onSaleCattleId, userId) => ({
@@ -184,7 +189,7 @@ export const api = createApi({
         body: onSaleCattleId,
         userId,
       }),
-      invalidatesTags: ["OnSaleCattle", "Favorite"],
+      invalidatesTags: ["OnSaleCattle", "Favorite", "OnSaleCattleDetails"],
     }),
     removeFromFavorite: build.mutation({
       query: (onSaleCattleId, userId) => ({
@@ -193,7 +198,7 @@ export const api = createApi({
         body: onSaleCattleId,
         userId,
       }),
-      invalidatesTags: ["OnSaleCattle"],
+      invalidatesTags: ["OnSaleCattle", "OnSaleCattleDetails"],
     }),
     addOneCattleToSale: build.mutation({
       query: (title, description, price, cattle_id) => ({
@@ -204,7 +209,7 @@ export const api = createApi({
         price,
         cattle_id,
       }),
-      invalidatesTags: ["OnSaleCattle"],
+      invalidatesTags: ["OnSaleCattle", "OnSaleCattleDetails"],
     }),
     changeProfileImage: build.mutation({
       query: (userId, image) => ({
@@ -285,4 +290,5 @@ export const {
   useGetMessagesQuery,
   useAddNewMessageMutation,
   useChangeSellerDescriptionMutation,
+  useGetQuestionsQuery,
 } = api;

@@ -23,6 +23,7 @@ export default function Chat() {
   const sellerId = location.state ? location.state.seller.id : null;
   const userEmail = useSelector((state) => state.global.userEmail);
   const { data, isLoading, isSuccess } = useGetUserByEmailQuery(userEmail);
+  const [nullify, setNullify] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -60,7 +61,10 @@ export default function Chat() {
   useEffect(() => {
     arrivalMessage && currentChat
       ? currentChat.members.includes(arrivalMessage.sender)
-      : null && setMessages((prev) => [...prev, arrivalMessage]);
+      : setNullify(null);
+    arrivalMessage && currentChat
+      ? setMessages((prev) => [...prev, arrivalMessage])
+      : setNullify(null);
   }, [arrivalMessage, currentChat, messages]);
 
   useEffect(() => {
@@ -199,9 +203,9 @@ export default function Chat() {
             {currentChat ? (
               <>
                 <div className="chatBoxTop">
-                  {messages.map((m) => (
+                  {messages.map((m, index) => (
                     <div ref={scrollRef}>
-                      <Message message={m} own={m.sender === userId} />
+                      <Message message={m} own={m.sender === userId} key={index+1} />
                     </div>
                   ))}
                 </div>

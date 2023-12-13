@@ -35,6 +35,7 @@ import CardSkeletonBase from "components/CardSkeltonBase";
 import SmallHeader from "components/SmallHeader";
 import SellerDashboard, { OnSaleCattleGetter } from "scenes/sellerdashboard";
 
+
 function SellerInfo() {
   const location = useLocation();
   const recievedProps = location.state.propsToPass;
@@ -43,6 +44,10 @@ function SellerInfo() {
   const [isDisabled, setIsDisabled] = React.useState(true);
   const [hyperlink, setHyperlink] = React.useState();
   const navigate = useNavigate();
+  const sellerLocation = {
+    lat: 37.7749, // Replace with seller's latitude
+    lng: -122.4194, // Replace with seller's longitude
+  };
 
 
   React.useEffect(() => {

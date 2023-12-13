@@ -8,13 +8,30 @@ import { useLocation } from "react-router-dom";
 import FAQs from "components/Product Page Components/FAQs";
 import { useDispatch, useSelector } from "react-redux";
 import AskQuestions from "components/AskQuestions";
+import { useGetSellerByEmailQuery, useGetSellerByIdQuery, useGetUserByEmailQuery } from "state/api";
 
 const OnSaleCattleDetails = () => {
-  const theme = useTheme();
-  const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.global.isLoggedIn);
+  const userEmail = useSelector((state) => state.global.userEmail);
   const location = useLocation();
   const recievedProps = location.state.propsToPass;
+  const [toQuestion, setToQuestion] = React.useState(false);
+  const [sellerItself, setSellerItself] = React.useState(true);
+  const { data, isLoading, isSuccess } = useGetSellerByIdQuery(recievedProps.seller_info);
+
+  useEffect(() => {
+    if (!isLoading && isSuccess) {
+      if (data.seller.user.email !== userEmail) {
+        setSellerItself(false);
+      }
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (!sellerItself) {
+      setToQuestion(true);
+    }
+  }, [sellerItself]);
 
   return (
     <div>
@@ -62,7 +79,7 @@ const OnSaleCattleDetails = () => {
             seller={recievedProps.seller_info}
           />
           <Box>
-            {isLoggedIn ? (
+            {isLoggedIn && isSuccess && toQuestion ? (
               <AskQuestions
                 onsalecattle={recievedProps._id}
                 seller={recievedProps.seller_info}

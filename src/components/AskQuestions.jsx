@@ -20,28 +20,10 @@ import {
 const AskQuestions = ({ onsalecattle, seller }) => {
   const userEmail = useSelector((state) => state.global.userEmail);
   const user = useGetUserByEmailQuery(userEmail);
-  const { data, isLoading, isSuccess } = useGetSellerByIdQuery(seller);
   const [addQuestion] = useAddQuestionMutation();
-  const [sellerEmail, setSellerEmail] = React.useState("");
   const [description, setDescription] = React.useState("");
   const theme = useTheme();
-
   //   const [userId, setUserId] = React.useState("");
-
-  useEffect(() => {
-    if (data && !isLoading && isSuccess) {
-      setSellerEmail(data.seller.user.email);
-    }
-  }, [isLoading, isSuccess]);
-
-  useEffect(() => {
-    if (data && !user.isLoading && user.isSuccess) {
-      console.log(user.data.email, sellerEmail);
-      if (user.data.email !== sellerEmail) {
-        setToQuestion(true);
-      }
-    }
-  }, [sellerEmail]);
 
   const handleSubmit = async () => {
     const payload = await addQuestion({

@@ -2,35 +2,33 @@ import axios from "axios";
 import React from "react";
 import { useEffect, useState } from "react";
 import "./conversation.css";
+import { Avatar, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import { useGetUserIdQuery, useGetUserQuery } from "state/api";
 
 export default function Conversation({ conversation, currentUser }) {
   const [user, setUser] = useState(null);
-  // const PF = process.env.REACT_APP_PUBLIC_FOLDER;
-
-  useEffect(() => {
-    const userId = conversation.members.find((m) => m !== currentUser._id);
-
-    const getUser = async () => {
-      try {
-        const res = await axios("http://localhost:5001/user/id/" + userId);
-        setUser(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getUser();
-  }, [currentUser, conversation]);
+  const [receiverId, setReceiverId] = useState(null);
+  const { data, isLoading, isSuccess} = useGetUserQuery(conversation.members.find((m) => m !== currentUser._id));
 
   return (
-    <div className="conversation">
-      <img
-        className="conversationImg"
-        src={user && user.profile ? user.profile.profile_picture : "nil"}
-        alt=""
-      />
-      <span className="conversationName">
-        {user && user.first_name ? user.first_name : "Loading"}
-      </span>
-    </div>
+    <React.Fragment>
+      <List>
+        <ListItem key="RemySharp">
+          <ListItemIcon>
+            <Avatar
+              sx={{
+                mr: "1rem",
+              }}
+              src={data && data.profile ? data.profile.profile_image : "nil"}
+              alt=""
+            />
+          </ListItemIcon>
+          <ListItemText >
+            {data && data.first_name ? data.first_name : "Loading"}
+          </ListItemText>
+          <ListItemText secondary="online" align="right"></ListItemText>
+        </ListItem>
+      </List>
+    </React.Fragment>
   );
 }
