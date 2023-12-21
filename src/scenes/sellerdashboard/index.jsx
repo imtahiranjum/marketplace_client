@@ -251,7 +251,7 @@ function SellerDashboard() {
                 display: "flex",
                 justifyContent: "space-between",
                 flexGrow: 1,
-                marginBottom: "2rem",
+                marginBottom: "0.5rem",
               }}
             >
               <Button
@@ -280,6 +280,27 @@ function SellerDashboard() {
                 }}
               >
                 Add Cattle for Sale
+              </Button>
+            </Box>
+            <Box
+              display={"flex"}
+              justifyContent={"flex-end"}
+            >
+              <Button
+                variant="contained"
+                color="warning"
+                startIcon={<Add />}
+                onClick={() => {
+                  navigate("/addcattleboardingservice", {
+                    replace: false,
+                    state: { seller_info: data.seller._id },
+                  });
+                }}
+                sx={{
+                  px: "1.1rem",
+                }}
+              >
+                Add Cattle Boarding Service
               </Button>
             </Box>
             {data || (!isLoading && isSuccess) ? (
