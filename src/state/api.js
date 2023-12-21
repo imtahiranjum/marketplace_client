@@ -19,7 +19,8 @@ export const api = createApi({
     "AllCattle",
     "Images",
     "Coversation",
-    "Chat"
+    "Chat",
+    "Favorite",
   ],
   endpoints: (build) => ({
     getQuestions: build.query({
@@ -122,14 +123,14 @@ export const api = createApi({
         body: newEmail,
         password,
       }),
-      invalidatesTags: ["User", "OnSaleCattleDetails"],
+      invalidatesTags: ["User", "AllCattle", "OnSaleCattle", "OnSaleCattleDetails", "Favorite", "Seller", "Cattle"],
     }),
     logoutUser: build.mutation({
       query: () => ({
         url: "user/logout",
         method: "POST",
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: ["User", "AllCattle", "OnSaleCattle", "OnSaleCattleDetails", "Favorite", "Seller", "Cattle"],
     }),
     addNewOnSaleCattle: build.mutation({
       query: (
